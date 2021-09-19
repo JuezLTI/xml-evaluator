@@ -7,7 +7,7 @@ const got = require('got')
 const FormData = require('form-data')
 
 async function login(baseUrl, email, password) {
-  return await got.post(`${baseUrl}/auth/login`, {
+  let result =  await got.post(`${baseUrl}/auth/login`, {
     json: {
       email,
       password,
@@ -15,6 +15,7 @@ async function login(baseUrl, email, password) {
     resolveBodyOnly: true,
     responseType: 'json',
   })
+  return result;
 }
 async function getAllProjects(baseUrl, token) {
   return await got
@@ -97,7 +98,7 @@ module.exports = {
   login,
   getAllExerciseStatements,
   getStatementContents,
-  updateStatementContents,
   getAllProjects,
   getExercise,
+  b64decode,
 }
