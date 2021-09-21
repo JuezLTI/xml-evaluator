@@ -5,20 +5,34 @@
 
  const api = require('./authorkit-api')
  const CONST = require('./CONST')
+ const fs = require('fs')
+ const path   = require('path');
+ path.resolve(__dirname, 'settings.json')
  module.exports = class Exercise {
    constructor(ID) {
      this.ID = ID
      this.JWT_TOKEN = undefined
+     this.init()
+     
    }
-   async load_exercise_byId() {
+
+   async load_localy_exercise(p){
+
+    const data = fs.readFileSync(path.join(__dirname,p), 'utf8')
+    Object.assign(this, JSON.parse(data))
+
+  }
+   async load_remote_exercise() {
      await this.do_auth()
  
      try {
-       this.YAPExILData = await api.getExercise(
+       const YAPExILData = await api.getExercise(
          CONST.BASE_URL,
          this.JWT_TOKEN,
          this.ID,
        )
+       Object.assign(this, YAPExILData)
+       
      } catch (err) {
        console.log(err)
      }
@@ -37,26 +51,25 @@
    to_string() {
      return JSON.stringify(this)
    }
-   reset() {
-     this.YAPExILData = {}
-     this.YAPExILData.is_deleted = false
-     this.YAPExILData.updated_at = '0000-00-00T00:00:00.000Z'
-     this.YAPExILData.created_at = '0000-00-00T00:00:00.000Z'
-     this.YAPExILData.id = '00000000-0000-0000-0000-000000000000'
-     this.YAPExILData.title = 'Draft exercise'
-     this.YAPExILData.module = ''
-     this.YAPExILData.project_id = '00000000-0000-0000-0000-000000000000'
-     this.YAPExILData.owner_id = '00000000-0000-0000-0000-000000000000'
-     this.YAPExILData.keywords = []
-     this.YAPExILData.type = ''
-     this.YAPExILData.event = ''
-     this.YAPExILData.platform = ''
-     this.YAPExILData.difficulty = ''
-     this.YAPExILData.status = ''
-     this.YAPExILData.timeout = 0
-     this.YAPExILData.programmingLanguages = []
-     this.YAPExILData.statements = []
-     this.YAPExILData.instructions = []
+   init() {
+     this.is_deleted = false
+     this.updated_at = '0000-00-00T00:00:00.000Z'
+     this.created_at = '0000-00-00T00:00:00.000Z'
+     this.id = '00000000-0000-0000-0000-000000000000'
+     this.title = 'Draft exercise'
+     this.module = ''
+     this.project_id = '00000000-0000-0000-0000-000000000000'
+     this.owner_id = '00000000-0000-0000-0000-000000000000'
+     this.keywords = []
+     this.type = ''
+     this.event = ''
+     this.platform = ''
+     this.difficulty = ''
+     this.status = ''
+     this.timeout = 0
+     this.programmingLanguages = []
+     this.statements = []
+     this.instructions = []
    }
  }
  
