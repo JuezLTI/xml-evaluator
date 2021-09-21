@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec xml-evaluator.js"
+    "test": "mocha --reporter spec exercise.js authorkit-api.js "
   },
   "author": "",
   "license": "ISC",
