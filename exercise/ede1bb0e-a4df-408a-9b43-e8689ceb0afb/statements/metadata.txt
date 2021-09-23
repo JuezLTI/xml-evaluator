@@ -1,0 +1,15 @@
+[
+	{
+		"is_deleted": false,
+		"created_at": "2021-06-28T05:29:50.951Z",
+		"updated_at": "2021-06-28T05:39:56.758Z",
+		"file": {
+			"sha": "7ad592ba884b39cc8d722528dc8b785875ede461"
+		},
+		"pathname": "quest.html",
+		"format": "html",
+		"nat_lang": "pl",
+		"id": "0f02f9ba-7551-41f6-9080-4eb802b4e611",
+		"exercise_id": "ede1bb0e-a4df-408a-9b43-e8689ceb0afb"
+	}
+]

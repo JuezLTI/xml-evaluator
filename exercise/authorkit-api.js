@@ -120,4 +120,5 @@ module.exports = {
     getInputContents,
     getOutputContents,
     getAllProjects,
+    b64decode
 }

@@ -32,7 +32,6 @@ module.exports = class ProgrammingExercise {
     }
     async load_remote_exercise(ID) {
         await this.do_auth()
-
         try {
             // set metada info
             const YAPExILData = await api.getExercise(
@@ -163,7 +162,6 @@ module.exports = class ProgrammingExercise {
         for (let exercise_zip_name of files) {
             var file_path = path.join(p, exercise_zip_name)
 
-            console.log(`reading ${exercise_zip_name}`)
             exercise_zip_name = exercise_zip_name.replace(/\.[^/.]+$/, "")
 
             exercise_list[exercise_zip_name] = new ProgrammingExercise();
@@ -171,12 +169,10 @@ module.exports = class ProgrammingExercise {
             const buffer = readChunk.sync(file_path, 0, 4100);
 
             let type = await fileType.fromBuffer(buffer)
-            console.log(type)
             if (type.ext = 'zip') {
                 try {
                     let unzip_path = path.join(temp_path(), exercise_zip_name)
                     await extract(file_path, { dir: unzip_path })
-                    console.log('Extraction complete')
 
                     let metadata = fs.readFileSync(path.join(unzip_path, 'metadata.txt'), { encoding: 'utf8', flag: 'r' });
                     exercise_list[exercise_zip_name] = Object.assign(this, JSON.parse(metadata))
@@ -220,7 +216,6 @@ module.exports = class ProgrammingExercise {
                             }
                         }
                     }
-                    console.log("done")
 
                 } catch (err) {
                     console.log(err)
@@ -252,6 +247,8 @@ module.exports = class ProgrammingExercise {
         this.timeout = 0
         this.programmingLanguages = []
         this.statements = []
+        this.solutions = []
+        this.tests = []
         this.instructions = []
     }
 }

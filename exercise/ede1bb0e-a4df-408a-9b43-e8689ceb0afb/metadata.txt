@@ -1,0 +1,38 @@
+{
+	"JWT_TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMyYmE4NDZhLTc1MDAtNDNjYS05YjM2LWIyZTc0ZWU5NzhhYyIsImlhdCI6MTYzMjI2MTAzNiwiZXhwIjoxNjMyMjY0NjM2LCJhdWQiOiJhdXRob3JraXQtYXBpIiwiaXNzIjoiNmI4N2Q0MzEtYjczYS00M2ZmLTlmN2MtMDY3NWQ0MzY4NTMxIn0.gVasPNbJOKjxtHpnAB50MGoidwZ-VeoYjgG_vdAES3w",
+	"is_deleted": false,
+	"updated_at": "2021-06-28T05:13:45.333Z",
+	"created_at": "2021-06-28T05:13:44.350Z",
+	"id": "ede1bb0e-a4df-408a-9b43-e8689ceb0afb",
+	"title": "Znaki zodiaku",
+	"module": "ad-hoc",
+	"project_id": "5b8471b6-348f-4c63-b860-5fe0b42492cd",
+	"owner_id": "ec16d633-03b6-4819-a145-c2141c435f7e",
+	"keywords": [],
+	"type": "blank_sheet",
+	"event": "",
+	"platform": "",
+	"difficulty": "easy",
+	"status": "draft",
+	"timeout": 0,
+	"programmingLanguages": [],
+	"statements": [
+		{
+			"is_deleted": false,
+			"created_at": "2021-06-28T05:29:50.951Z",
+			"updated_at": "2021-06-28T05:39:56.758Z",
+			"file": {
+				"sha": "7ad592ba884b39cc8d722528dc8b785875ede461"
+			},
+			"pathname": "quest.html",
+			"format": "html",
+			"nat_lang": "pl",
+			"id": "0f02f9ba-7551-41f6-9080-4eb802b4e611",
+			"exercise_id": "ede1bb0e-a4df-408a-9b43-e8689ceb0afb"
+		}
+	],
+	"solutions": [],
+	"tests": [],
+	"instructions": [],
+	"ID": "ede1bb0e-a4df-408a-9b43-e8689ceb0afb"
+}

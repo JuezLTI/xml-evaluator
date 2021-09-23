@@ -1,152 +1,65 @@
-const chai = require('chai')
-  , expect = chai.expect
-  , should = chai.should();
+const chai = require('chai'),
+    expect = chai.expect,
+    should = chai.should();
 const api = require('../exercise/authorkit-api')
-const Exercise = require('../exercise/exercise') 
-const CONST = require('../exercise/CONST')
+const ProgrammingExercise = require('../exercise/programming-exercise')
+const CONST = require('../exercise/CONST');
+const { doesNotMatch } = require('assert');
 var JWT_TOKEN = "";
 
 
-describe('Test for exercise class', async function () {
-    var exercise_obj
-  
+describe('Test for exercise class', async function() {
+    describe('Load  class from a remote repo ', async function() {
+        this.timeout(10000);
 
-    describe('Load  class from a remote repo ', async function () {
         before(async function() {
-            JWT_TOKEN =  (
-              await api.login(CONST.BASE_URL, CONST.EMAIL, CONST.PASSWORD)
-            ).accessToken 
-        
-             exercise_obj = new Exercise('ede1bb0e-a4df-408a-9b43-e8689ceb0afb')
-            await exercise_obj.load_remote_exercise()
-        
-          }
-          );
-      
-          it('id ',  function () {
-            should.exist(exercise_obj.id)
-          })
-          it('is_deleted ',  function () {
-            
-            should.exist(exercise_obj.is_deleted)
-          })
-          it('updated_at ',  function () {
-            should.exist(exercise_obj.updated_at)
-          })
-          it('created_at ',  function () {
-            should.exist(exercise_obj.created_at)
-          })
-          it('title ',  function () {
-            should.exist(exercise_obj.title)
-          })
-          it('type ',  function () {
-            should.exist(exercise_obj.type)
-          })
-          it('module ',  function () {
-            should.exist(exercise_obj.module)
-          })
-          it('project_id ',  function () {
-            should.exist(exercise_obj.project_id)
-          })
-          it('owner_id ',  function () {
-            should.exist(exercise_obj.owner_id)
-          })
-          it('keywords ',  function () {
-            should.exist(exercise_obj.keywords)
-          })
-          it('event ',  function () {
-            should.exist(exercise_obj.event)
-          })
-          it('platform ',  function () {
-            should.exist(exercise_obj.platform)
-          })
-          it('difficulty ',  function () {
-            should.exist(exercise_obj.difficulty)
-          })
-          it('status ',  function () {
-            should.exist(exercise_obj.status)
-          })
-          it('timeout ',  function () {
-            should.exist(exercise_obj.timeout)
-          })
-          it('programmingLanguages ',  function () {
-            should.exist(exercise_obj.programmingLanguages)
-          })
-          it('statements ',  function () {
-            should.exist(exercise_obj.statements)
-          })
-          it('instructions ',  function () {
-            should.exist(exercise_obj.instructions)
-          })
-      
-    })
-    describe('Load  class from a local repo ', async function () {
-        before(async function() {
-          
-        
-            exercise_obj.init()
+            JWT_TOKEN = (
+                await api.login(CONST.BASE_URL, CONST.EMAIL, CONST.PASSWORD)
+            ).accessToken
+        })
+
+        it('Testing metadata of an exercise fetched using authokit-api ', async function() {
+            let exercise_obj = new ProgrammingExercise()
+            await exercise_obj.load_remote_exercise('e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7')
+            metadata(exercise_obj)
+        })
+        it('Testing metadata of an exercise using json file ', async function() {
+            let exercise_obj = new ProgrammingExercise()
             await exercise_obj.load_localy_exercise('../tests/resources/YAPExIL_exercise.json')
-        
-          }
-          );
-      
-          it('id ',  function () {
-            should.exist(exercise_obj.id)
-          })
-          it('is_deleted ',  function () {
-            
-            should.exist(exercise_obj.is_deleted)
-          })
-          it('updated_at ',  function () {
-            should.exist(exercise_obj.updated_at)
-          })
-          it('created_at ',  function () {
-            should.exist(exercise_obj.created_at)
-          })
-          it('title ',  function () {
-            should.exist(exercise_obj.title)
-          })
-          it('type ',  function () {
-            should.exist(exercise_obj.type)
-          })
-          it('module ',  function () {
-            should.exist(exercise_obj.module)
-          })
-          it('project_id ',  function () {
-            should.exist(exercise_obj.project_id)
-          })
-          it('owner_id ',  function () {
-            should.exist(exercise_obj.owner_id)
-          })
-          it('keywords ',  function () {
-            should.exist(exercise_obj.keywords)
-          })
-          it('event ',  function () {
-            should.exist(exercise_obj.event)
-          })
-          it('platform ',  function () {
-            should.exist(exercise_obj.platform)
-          })
-          it('difficulty ',  function () {
-            should.exist(exercise_obj.difficulty)
-          })
-          it('status ',  function () {
-            should.exist(exercise_obj.status)
-          })
-          it('timeout ',  function () {
-            should.exist(exercise_obj.timeout)
-          })
-          it('programmingLanguages ',  function () {
-            should.exist(exercise_obj.programmingLanguages)
-          })
-          it('statements ',  function () {
-            should.exist(exercise_obj.statements)
-          })
-          it('instructions ',  function () {
-            should.exist(exercise_obj.instructions)
-          })
-      
-    })
-    
-  })
+            metadata(exercise_obj)
+        })
+        it('Testing metadata  of an exercise using deserialization ', async function() {
+            let aux = await ProgrammingExercise.deserialize()
+            for (let t of aux) {
+                metadata(t)
+            }
 
+        })
+        it('Testing metadata from a object that was fetch using authorkit-api then was done serialization and finally deserialization ', async function() {
+            let exercise_obj = new ProgrammingExercise()
+            exercise_obj.load_remote_exercise('e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7')
+            await exercise_obj.serialize()
+            let b = await ProgrammingExercise.deserialize()
+            for (let t of b) {
+                metadata(t)
+            }
+
+        })
+        done()
+    })
+
+})
+
+function metadata(exercise_obj) {
+    should.exist(exercise_obj.id)
+    should.exist(exercise_obj.title)
+    should.exist(exercise_obj.type)
+    should.exist(exercise_obj.difficulty)
+    should.exist(exercise_obj.status)
+    should.exist(exercise_obj.keywords)
+    should.exist(exercise_obj.platform)
+    should.exist(exercise_obj.statements)
+    should.exist(exercise_obj.solutions)
+    should.exist(exercise_obj.tests)
+
+}

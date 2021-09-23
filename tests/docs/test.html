@@ -1,0 +1,79 @@
+    <section class="suite">
+      <h1>Test for exercise class</h1>
+      <dl>
+        <section class="suite">
+          <h1>Load  class from a remote repo </h1>
+          <dl>
+            <dt>Testing metadata of an exercise fetched using authokit-api </dt>
+            <dt>/home/marco/INESCT/xml-evaluator/tests/exercise.js</dt>
+            <dd><pre><code>async function() {
+            let exercise_obj = new ProgrammingExercise()
+            await exercise_obj.load_remote_exercise(&#x27;e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7&#x27;)
+            metadata(exercise_obj)
+        }</code></pre></dd>
+            <dt>Testing metadata of an exercise using json file </dt>
+            <dt>/home/marco/INESCT/xml-evaluator/tests/exercise.js</dt>
+            <dd><pre><code>async function() {
+            let exercise_obj = new ProgrammingExercise()
+            await exercise_obj.load_localy_exercise(&#x27;../tests/resources/YAPExIL_exercise.json&#x27;)
+            metadata(exercise_obj)
+        }</code></pre></dd>
+            <dt>Testing metadata  of an exercise using deserialization </dt>
+            <dt>/home/marco/INESCT/xml-evaluator/tests/exercise.js</dt>
+            <dd><pre><code>async function() {
+            let aux = await ProgrammingExercise.deserialize()
+            for (let t of aux) {
+                metadata(t)
+            }
+        }</code></pre></dd>
+            <dt>Testing metadata from a object that was fetch using authorkit-api then was done serialization and finally deserialization </dt>
+            <dt>/home/marco/INESCT/xml-evaluator/tests/exercise.js</dt>
+            <dd><pre><code>async function() {
+            let exercise_obj = new ProgrammingExercise()
+            exercise_obj.load_remote_exercise(&#x27;e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7&#x27;)
+            await exercise_obj.serialize()
+            let b = await ProgrammingExercise.deserialize()
+            for (let t of b) {
+                metadata(t)
+            }
+        }</code></pre></dd>
+          </dl>
+        </section>
+      </dl>
+    </section>
+    <section class="suite">
+      <h1>Authorkit tests</h1>
+      <dl>
+        <section class="suite">
+          <h1>Exercises</h1>
+          <dl>
+            <dt>Get exercise by its id </dt>
+            <dt>/home/marco/INESCT/xml-evaluator/tests/authorkit-api.js</dt>
+            <dd><pre><code>async function() {
+            const exercise_id = &#x22;60e038a4-f3ee-4229-899d-549509aedd73&#x22;
+            const a = await api.getExercise(CONST.BASE_URL, JWT_TOKEN, exercise_id)
+            const cmd = &#x60;curl -X &#x27;GET&#x27; \
+      &#x27;${CONST.BASE_URL}/exercises/${exercise_id}?join=statements&#x26;join=instructions&#x26;join=solutions&#x26;join=tests&#x27; \
+      -H &#x27;accept: applicaiton/json&#x27; \
+      -H &#x27;Content-Type: application/json&#x27; \
+      -H &#x27;Authorization: Bearer ${JWT_TOKEN}&#x27; \ &#x60;
+            const { stdout, stderr } = await exec(cmd);
+            expect(JSON.stringify(a)).to.equal(stdout);
+        }</code></pre></dd>
+            <dt>Get statement by its id </dt>
+            <dt>/home/marco/INESCT/xml-evaluator/tests/authorkit-api.js</dt>
+            <dd><pre><code>async function() {
+            const statement_id = &#x22;91cec638-9b76-4fbb-aff2-7af0434c9e35&#x22;
+            const a = await api.getStatementContents(CONST.BASE_URL, JWT_TOKEN, statement_id, true)
+            const cmd = &#x60;curl -X &#x27;GET&#x27; \
+      &#x27;${CONST.BASE_URL}/statements/${statement_id}/contents&#x27; \
+      -H &#x27;accept: */*&#x27; \
+      -H &#x27;Content-Type: application/json&#x27; \
+      -H &#x27;Authorization: Bearer ${JWT_TOKEN}&#x27; \ &#x60;
+            const { stdout, stderr } = await exec(cmd);
+            expect(a).to.equal(api.b64decode(stdout));
+        }</code></pre></dd>
+          </dl>
+        </section>
+      </dl>
+    </section>
