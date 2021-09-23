@@ -7,98 +7,117 @@ const got = require('got')
 const FormData = require('form-data')
 
 async function login(baseUrl, email, password) {
-  let result =  await got.post(`${baseUrl}/auth/login`, {
-    json: {
-      email,
-      password,
-    },
-    resolveBodyOnly: true,
-    responseType: 'json',
-  })
-  return result;
+    let result = await got.post(`${baseUrl}/auth/login`, {
+        json: {
+            email,
+            password,
+        },
+        resolveBodyOnly: true,
+        responseType: 'json',
+    })
+    return result;
 }
 async function getAllProjects(baseUrl, token) {
-  return await got
-    .get(`${baseUrl}/projects`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      resolveBodyOnly: true,
-    })
-    .json()
+    return await got
+        .get(`${baseUrl}/projects`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            resolveBodyOnly: true,
+        })
+        .json()
 }
 
-async function getAllExerciseStatements(baseUrl, token, projectId) {
-  const searchParams = {
-    fields: 'id,title,keywords',
-    join: 'statements',
-    sort: 'title,ASC',
-    limit: 200,
-  }
+async function getAllExercise(baseUrl, token, projectId) {
+    const searchParams = {
+        fields: 'id,title,keywords',
+        join: 'statements',
+        sort: 'title,ASC',
+        limit: 200,
+    }
 
-  //console.log(new URLSearchParams(searchParams).toString())
-  return await got
-    .get(`${baseUrl}/exercises`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        project: projectId,
-      },
-      resolveBodyOnly: true,
-      searchParams: new URLSearchParams(searchParams),
-    })
-    .json()
+    return await got
+        .get(`${baseUrl}/exercises`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                project: projectId,
+            },
+            resolveBodyOnly: true,
+            searchParams: new URLSearchParams(searchParams),
+        })
+        .json()
 }
 
 async function getExercise(baseUrl, token, id) {
-  const searchParams = new URLSearchParams()
-  searchParams.append('join', 'statements')
-  searchParams.append('join', 'instructions')
-  searchParams.append('join', 'embeddable')
-  searchParams.append('join', 'skeleton')
+    const searchParams = new URLSearchParams()
+    searchParams.append('join', 'statements')
+    searchParams.append('join', 'instructions')
+    searchParams.append('join', 'solutions')
+    searchParams.append('join', 'tests')
 
-  return await got
-    .get(`${baseUrl}/exercises/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      resolveBodyOnly: true,
-      searchParams: new URLSearchParams(searchParams),
+    return await got
+        .get(`${baseUrl}/exercises/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            resolveBodyOnly: true,
+            searchParams: new URLSearchParams(searchParams),
+        })
+        .json()
+}
+
+async function getStatementContents(baseUrl, token, id, decode) {
+    const b64contents = await got.get(`${baseUrl}/statements/${id}/contents`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        resolveBodyOnly: true,
     })
-    .json()
+    let data = b64contents
+    if (decode) data = b64decode(b64contents)
+    return data
 }
 
-async function getStatementContents(baseUrl, token, id) {
-  const b64contents = await got.get(`${baseUrl}/statements/${id}/contents`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    resolveBodyOnly: true,
-  })
-  return b64decode(b64contents)
+async function getSolutionContents(baseUrl, token, id) {
+    const b64contents = await got.get(`${baseUrl}/solutions/${id}/contents`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        resolveBodyOnly: true,
+    })
+    return b64decode(b64contents)
 }
-
-async function updateStatementContents(baseUrl, token, id, filename, contents) {
-  const fd = new FormData()
-  fd.append('file', Buffer.from(contents), filename)
-  return await got.patch(`${baseUrl}/statements/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    resolveBodyOnly: true,
-    body: fd,
-  })
+async function getInputContents(baseUrl, token, id) {
+    const b64contents = await got.get(`${baseUrl}/tests/${id}/input/contents`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        resolveBodyOnly: true,
+    })
+    return b64decode(b64contents)
+}
+async function getOutputContents(baseUrl, token, id) {
+    const b64contents = await got.get(`${baseUrl}/tests/${id}/output/contents`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        resolveBodyOnly: true,
+    })
+    return b64decode(b64contents)
 }
 
 function b64decode(data) {
-  const buff = Buffer.from(data, 'base64')
-  return buff.toString('utf8')
+    const buff = Buffer.from(data, 'base64')
+    return buff.toString('utf8')
 }
 
 module.exports = {
-  login,
-  getAllExerciseStatements,
-  getStatementContents,
-  getAllProjects,
-  getExercise,
-  b64decode,
+    login,
+    getAllExercise,
+    getExercise,
+    getStatementContents,
+    getSolutionContents,
+    getInputContents,
+    getOutputContents,
+    getAllProjects,
 }

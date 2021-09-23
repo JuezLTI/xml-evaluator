@@ -1,0 +1,41 @@
+[
+	{
+		"is_deleted": false,
+		"created_at": "2021-05-31T11:03:58.486Z",
+		"updated_at": "2021-05-31T11:04:00.310Z",
+		"file": {
+			"sha": "8f3fdcca1637b0717389ac288d6446f57bb5e932"
+		},
+		"pathname": "it_statements.html",
+		"format": "html",
+		"nat_lang": "it",
+		"id": "d4f4e215-94a2-4856-9ef4-7fa35503f962",
+		"exercise_id": "e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7"
+	},
+	{
+		"is_deleted": false,
+		"created_at": "2021-05-31T11:04:05.968Z",
+		"updated_at": "2021-05-31T11:04:07.491Z",
+		"file": {
+			"sha": "3dd928f7c62d5a6c7dc0328c152535baafcbe810"
+		},
+		"pathname": "statements.html",
+		"format": "html",
+		"nat_lang": "en",
+		"id": "45a96f7a-a322-4d31-8e45-1f6a52e1c82a",
+		"exercise_id": "e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7"
+	},
+	{
+		"is_deleted": false,
+		"created_at": "2020-08-25T09:10:54.700Z",
+		"updated_at": "2020-08-25T09:10:57.110Z",
+		"file": {
+			"sha": "afba8ab5ce16442d5eb00420efbeaaa7194aac52"
+		},
+		"pathname": "statements.pdf",
+		"format": "pdf",
+		"nat_lang": "en",
+		"id": "51db7d14-8f28-429c-8451-f0d1457f6f83",
+		"exercise_id": "e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7"
+	}
+]
