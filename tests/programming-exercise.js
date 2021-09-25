@@ -1,12 +1,12 @@
 const chai = require('chai'),
     expect = chai.expect,
     should = chai.should();
-const api = require('../exercise/authorkit-api')
+const api = require('../programming-exercise/authorkit-api')
 const path = require('path');
 
 
-const ProgrammingExercise = require('../exercise/programming-exercise')
-const CONST = require('../exercise/CONST');
+const ProgrammingExercise = require('../programming-exercise/programming-exercise')
+const CONST = require('../programming-exercise/CONST');
 var JWT_TOKEN = "";
 
 

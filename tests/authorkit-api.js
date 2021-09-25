@@ -1,8 +1,8 @@
 const chai = require('chai'),
     expect = chai.expect,
     should = chai.should();
-const api = require('../exercise/authorkit-api')
-const CONST = require('../exercise/CONST')
+const api = require('../programming-exercise/authorkit-api')
+const CONST = require('../programming-exercise/CONST')
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 var JWT_TOKEN = "";

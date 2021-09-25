@@ -4,10 +4,10 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "mocha --reporter spec exercise.js authorkit-api.js ",
-        "todoc": "touch ./docs/test.html ; mocha exercise authorkit-api.js --reporter=doc | cat  > docs/test.html ",
-        "nyan": "mocha --reporter nyan exercise.js authorkit-api.js ",
-        "plane": "mocha --reporter landing  exercise.js authorkit-api.js ",
+        "test": "mocha --reporter spec programming-exercise.js authorkit-api.js ",
+        "todoc": "touch ./docs/test.html ; mocha programming-exercise authorkit-api.js --reporter=doc | cat  > docs/test.html ",
+        "nyan": "mocha --reporter nyan programming-exercise.js authorkit-api.js ",
+        "plane": "mocha --reporter landing  programming-exercise.js authorkit-api.js ",
         "setup": "npm install && mkdir resources docs"
     },
     "author": "",
