@@ -105,6 +105,17 @@ async function getOutputContents(baseUrl, token, id) {
     })
     return b64decode(b64contents)
 }
+async function getYapexilSchema(URI) {
+    const data = await got.get(URI, {
+        headers: {
+            resolveBodyOnly: true,
+            responseType: 'json',
+        },
+        resolveBodyOnly: true,
+    })
+    return JSON.parse(data)
+}
+
 
 function b64decode(data) {
     const buff = Buffer.from(data, 'base64')
@@ -120,5 +131,6 @@ module.exports = {
     getInputContents,
     getOutputContents,
     getAllProjects,
-    b64decode
+    b64decode,
+    getYapexilSchema
 }

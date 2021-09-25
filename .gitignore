@@ -1,3 +1,7 @@
-exercise/node_modules/
+programming-exercise/node_modules/
+programming-exercise/serialized/
+programming-exercise/temp/
 tests/node_modules/
+tests/resources/
+tests/docs/
 
