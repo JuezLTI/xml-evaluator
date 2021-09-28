@@ -29,6 +29,18 @@ path.resolve(__dirname, 'settings.json');
 var validate;
 var JWT_TOKEN;
 /****************************************************************/
+/****************************************************************/
+const Common_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/Common.json', { encoding: 'utf8', flag: 'r' }))
+const YAPEXIL_RESOURCE_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_RESOURCE.json', { encoding: 'utf8', flag: 'r' }))
+const YAPEXIL_TEST_SET_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_TEST_SET.json', { encoding: 'utf8', flag: 'r' }))
+const YAPEXIL_TESTS_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_TESTS.json', { encoding: 'utf8', flag: 'r' }))
+const YAPEXIL_SOLUTIONS_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_SOLUTIONS.json', { encoding: 'utf8', flag: 'r' }))
+const YAPEXIL_STATEMENTS_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_STATEMENTS.json', { encoding: 'utf8', flag: 'r' }))
+const YAPEXIL_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL.json', { encoding: 'utf8', flag: 'r' }))
+
+var validate = ajv.addSchema(Common_schema).addSchema(YAPEXIL_RESOURCE_schema).addSchema(YAPEXIL_TESTS_schema).addSchema(YAPEXIL_TEST_SET_schema).addSchema(YAPEXIL_SOLUTIONS_schema).addSchema(YAPEXIL_STATEMENTS_schema).compile(YAPEXIL_schema)
+
+/****************************************************************/
 
 /** @function do_auth
  *  
@@ -52,142 +64,234 @@ async function do_auth() {
  */
 
 module.exports = class ProgrammingExercise {
-    constructor(obj) {
-            Object.assign(this, this.init())
-            if (obj != undefined) {
-                this.id = obj.id
-                this.title = obj.title
-                this.author = obj.author
-                this.keywords = obj.keywords
-                this.status = obj.status
-                this.type = obj.type
-                this.created_at = obj.created_at
-                this.statements = obj.statements
-                this.solutions = obj.solutions
-                this.tests = obj.tests
-                if (`tests_contents_in` in obj) {
-                    this.tests_contents_in = obj.tests_contents_in
-                }
-                if (`tests_contents_out` in obj) {
-                    this.tests_contents_out = obj.tests_contents_out
-                }
-                if (`solutions_contents` in obj) {
-                    this.solutions_contents = obj.solutions_contents
-                }
-                if (`statements_contents` in obj) {
-                    this.statements_contents = obj.statements_contents
-                }
-                console.log(`Is this exercise valid: ${ this.validate()}`)
+    constructor(exercise) {
+        if (exercise != undefined && ProgrammingExercise.validate(exercise))
+            Object.assign(this, exercise)
 
+    }
+    setId(id) {
+        if (!isNaN(id) && id > 0) {
+            this.id = id
+            return true
+        }
+        return false
+
+    }
+    setTitle(title) {
+        if (typeof title === 'string' || title instanceof String) {
+            this.title = title
+            return true
+        }
+        return false
+
+    }
+    setAuthor(author) {
+        if (typeof author === 'string' || author instanceof String) {
+            this.author = author
+            return true
+        }
+        return false
+    }
+    setKeywords(keywords) {
+        if (Array.isArray(keywords)) {
+            for (let str of keywords) {
+                if (str.length > 50)
+                    return false
             }
+            this.keywords = keywords
+            return true
+        }
+        return false
+    }
+    setStatus(status) {
+        if (typeof status === 'string' || status instanceof String) {
+            status = status.toUpperCase()
+            if (["DRAFT", "PUBLISHED", "UNPUBLISHED", "TRASH"].includes(status)) {
+                this.status = status
+                return true
+            } else return false
+        }
+        return false
+    }
+    setType(type) {
+        if (typeof type === 'string' || type instanceof String) {
+            type = type.toUpperCase()
+            if ([
+                    "BLANK_SHEET",
+                    "EXTENSION",
+                    "IMPROVEMENT",
+                    "BUG_FIX",
+                    "FILL_IN_GAPS",
+                    "SORT_BLOCKS",
+                    "SPOT_BUG"
+                ].includes(type)) {
+                this.type = type
+                return true
+            } else return false
+        }
+        return false
+    }
+    setCreated_at(created_at) {
+        if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(date)) {
+            this.created_at = created_at
+            return true
+        }
+        return falses
+    }
+    setTests(tests) {
+        validate = ajv.compile(YAPEXIL_TESTS_schema)
+        if (validate(tests)) {
+            this.tests = tests
+            return true
+        }
+        console.log(tests)
+        console.log(JSON.stringify(validate.errors))
+        return false
 
+    }
+    setSolutions(solutions) {
+        validate = ajv.compile(YAPEXIL_SOLUTIONS_schema)
 
+        if (validate(solutions)) {
+            this.solutions = solutions
+            return true
+        }
+        console.log(JSON.stringify(validate.errors))
+        return false
+    }
+    setStatements(statements) {
+        validate = ajv.compile(YAPEXIL_STATEMENTS_schema)
+        if (validate(statements)) {
+            this.statements = statements
+            return true
+        }
+        console.log(JSON.stringify(validate.errors))
+
+        return false
+    }
+    setTests_contents_in(tests_contents_in) {
+        this.tests_contents_in = tests_contents_in
+    }
+    setTests_contents_out(tests_contents_out) {
+        this.tests_contents_out = tests_contents_out
+    }
+    setSolutions_contents(solutions_contents) {
+        this.solutions_contents = solutions_contents
+    }
+    setStatements_contents(statements_contents) {
+        this.statements_contents = statements_contents
+    }
+
+    /** @function getDescription
+     *  
+     * This function returns the an object list  with an  question statement and the format 
+     *  */
+    getDescription() {
+            let list = this.statements.map((data) => {
+                let obj = { type: data.format, content: this.statements_contents[data.id] }
+                return obj
+            })
+            return list
+        }
+        /** @function getTests
+         *  
+         * This function returns the an object list  with an test input and ouput
+         *  */
+    getTests() {
+            let list = this.tests.map((data) => {
+                let obj = { input: this.tests_contents_in[data.id], output: this.tests_contents_out[data.id] }
+                return obj
+            })
+            return list
+        }
+        /** @function getSolutions
+         *  
+         * This function returns the an object list  with the solutions
+         *  */
+    getSolutions() {
+            let list = this.solutions.map((data) => {
+                let obj = { name: data.pathname, solution: this.solutions_contents[data.id] }
+                return obj
+            })
+            return list
         }
         /** @function load_remote_exercise
          *  
          * This function will load an exercise coming from authorkit API in this class 
          *  @param {string} ID  The exercise ID   */
     async load_remote_exercise(ID) {
-            await do_auth()
-            try {
+        await do_auth()
+        try {
 
-                const YAPExILData = await api.getExercise(
+            const YAPExILData = await api.getExercise(
+                CONST.BASE_URL,
+                JWT_TOKEN,
+                ID,
+                true
+            )
+            Object.assign(this, YAPExILData)
+
+
+            // If this exercise is coming through the authokit lets get some data that are missing
+            // set statments content of the exercise
+            this.statements_contents = []
+            for (let metadata_statment of this.statements) {
+                let decode = metadata_statment.format == "pdf" ? false : true
+                this.statements_contents[metadata_statment.id] = await api.getStatementContents(
                     CONST.BASE_URL,
                     JWT_TOKEN,
-                    ID,
+                    metadata_statment.id,
+                    decode
                 )
-                Object.assign(this, YAPExILData)
-
-                /**************************************************************************************************/
-                //NORMALIZING DATA FETCHED BY URI  
-                //the data coming to the author kit API need to be changed to pass in AJV test
-                this.type = this.type.toUpperCase()
-                this.difficulty = this.difficulty.toUpperCase()
-                this.status = this.status.toUpperCase()
-                for (let i in this.statements) {
-                    this.statements[i].format = this.statements[i].format.toUpperCase()
-
-                }
-                for (let i in this.tests) {
-                    this.tests[i].input = this.tests[i].input.pathname
-                    this.tests[i].output = this.tests[i].output.pathname
-                    if (!('message' in this.tests[i].feedback)) {
-                        this.tests[i].feedback.message = ""
-                    }
-                    if (!('weight' in this.tests[i].feedback)) {
-                        this.tests[i].feedback.weight = ""
-                    }
-                }
-                /**************************************************************************************************/
-                // If this exercise is coming through the authokit lets get some data that are missing
-                // set statments content of the exercise
-                this.statements_contents = []
-                for (let metadata_statment of this.statements) {
-                    let decode = metadata_statment.format == "pdf" ? false : true
-                    this.statements_contents[metadata_statment.id] = await api.getStatementContents(
-                        CONST.BASE_URL,
-                        JWT_TOKEN,
-                        metadata_statment.id,
-                        decode
-                    )
-                }
-
-                // set solutions content of the exercise
-                this.solutions_contents = []
-                for (let metadata_solutions of this.solutions) {
-                    this.solutions_contents[metadata_solutions.id] = await api.getSolutionContents(
-                        CONST.BASE_URL,
-                        JWT_TOKEN, metadata_solutions.id
-                    )
-                }
-
-
-                // set output test content of the exercise
-                this.tests_contents_out = []
-                for (let metadata_tests of this.tests) {
-                    this.tests_contents_out[metadata_tests.id] = await api.getOutputContents(
-                        CONST.BASE_URL,
-                        JWT_TOKEN,
-                        metadata_tests.id,
-                    )
-                }
-
-                // set input test content of the exercise
-                this.tests_contents_in = []
-                for (let metadata_tests of this.tests) {
-                    this.tests_contents_in[metadata_tests.id] = await api.getInputContents(
-                        CONST.BASE_URL,
-                        JWT_TOKEN,
-                        metadata_tests.id,
-                    )
-                }
-                /**************************************************************************************************/
-            } catch (err) {
-                console.log(err)
-            } finally {
-                console.log(`Is this exercise valid: ${ this.validate()}`)
             }
 
+            // set solutions content of the exercise
+            this.solutions_contents = []
+            for (let metadata_solutions of this.solutions) {
+                this.solutions_contents[metadata_solutions.id] = await api.getSolutionContents(
+                    CONST.BASE_URL,
+                    JWT_TOKEN, metadata_solutions.id
+                )
+            }
+
+
+            // set output test content of the exercise
+            this.tests_contents_out = []
+            for (let metadata_tests of this.tests) {
+                this.tests_contents_out[metadata_tests.id] = await api.getOutputContents(
+                    CONST.BASE_URL,
+                    JWT_TOKEN,
+                    metadata_tests.id,
+                )
+            }
+
+            // set input test content of the exercise
+            this.tests_contents_in = []
+            for (let metadata_tests of this.tests) {
+                this.tests_contents_in[metadata_tests.id] = await api.getInputContents(
+                    CONST.BASE_URL,
+                    JWT_TOKEN,
+                    metadata_tests.id,
+                )
+            }
+            /**************************************************************************************************/
+        } catch (err) {
+            console.log(err)
         }
-        /** @function setup_validate
-         *  
-         * This function just needs to be called once, since this is a function that will set for us the YAPEXILSCHEMA 
-         *   */
-    static async setup_validate() {
-            const schema = await api.getYapexilSchema(CONST.YAPEXIL_SCHEMA);
-            validate = ajv.compile(schema)
-        }
-        /** @function validate
-         *  
-         * This function makes an evaluation from the current object using the schema loaded by the function setup_validate()
-         *   */
-    validate() {
-        const valid = validate(this)
+
+    }
+
+    /** @function validate
+     *  
+     * This function makes an evaluation from an object using the schema loaded by the function setup_validate()
+     *   */
+    static validate(obj) {
+        validate = ajv.compile(YAPEXIL_schema)
+        const valid = validate(obj)
         if (!valid) console.log(JSON.stringify(validate.errors))
         return valid
 
     }
-
 
     /** @function  serialize
      * 
@@ -198,6 +302,7 @@ module.exports = class ProgrammingExercise {
     async serialize(p = serialized_path()) {
 
             const directory = path.join(__dirname, this.id)
+
             if (!fs.existsSync(directory)) {
                 fs.mkdirSync(directory);
                 fs.writeFileSync(path.join(directory, "metadata.txt"), JSON.stringify(this, null, '\t'), {
@@ -342,21 +447,6 @@ module.exports = class ProgrammingExercise {
     }
     to_string() {
         return JSON.stringify(this)
-    }
-    init() {
-        return {
-            id: '00000000-0000-0000-0000-000000000000',
-            title: 'Draft exercise',
-            author: "",
-            keywords: [],
-            status: '',
-            type: '',
-            created_at: '0000-00-00T00:00:00.000Z',
-            statements: [],
-            solutions: [],
-            tests: [],
-        }
-
     }
 }
 
