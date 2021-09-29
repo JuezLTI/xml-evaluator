@@ -7,12 +7,10 @@ const fs = require('fs')
 const Common_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/Common.json', { encoding: 'utf8', flag: 'r' }))
 const PEARL_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/PEARL/PEARL.json', { encoding: 'utf8', flag: 'r' }))
 const PEARL_REPLY_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/PEARL/PEARL_REPLY.json', { encoding: 'utf8', flag: 'r' }))
-const PEARL_REQUEST_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/PEARL/PEARL_REQUEST.json', { encoding: 'utf8', flag: 'r' }))
-var validate = ajv.addSchema(Common_schema).addSchema(PEARL_REPLY_schema).addSchema(PEARL_REQUEST_schema).compile(PEARL_schema)
-
+const PEARL_REQUEST_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/PEARL/PEARL_REQUEST.json', { encoding: 'utf8', flag: 'r' }));
 /****************************************************************/
 module.exports = class EvaluationReport {
-
+    static validate = ajv.addSchema(Common_schema).addSchema(PEARL_REPLY_schema).addSchema(PEARL_REQUEST_schema).compile(PEARL_schema)
     constructor(message) {
 
         if (message != undefined && EvaluationReport.validate(message))
@@ -31,12 +29,12 @@ module.exports = class EvaluationReport {
             this.date = date
             return true
         }
-        return falses
+        return false
 
     }
     setRequest(request) {
-        validate = ajv.compile(PEARL_REQUEST_schema)
-        if (validate(request)) {
+        EvaluationReport.validate = ajv.compile(PEARL_REQUEST_schema)
+        if (EvaluationReport.validate(request)) {
             this.request = {}
             this.request.date = request.date
             if ('program' in request) {
@@ -50,8 +48,8 @@ module.exports = class EvaluationReport {
 
     }
     setReply(reply) {
-        validate = ajv.compile(PEARL_REPLY_schema)
-        if (validate(reply)) {
+        EvaluationReport.validate = ajv.compile(PEARL_REPLY_schema)
+        if (EvaluationReport.validate(reply)) {
             this.reply = {}
 
             if ('capabilities' in reply)
@@ -67,9 +65,10 @@ module.exports = class EvaluationReport {
         return false
 
     }
-    static validate(obj) {
-        validate = ajv.compile(PEARL_schema)
-        const valid = validate(obj)
+    static isValidate(obj) {
+        EvaluationReport.validate = ajv.compile(PEARL_schema)
+
+        const valid = EvaluationReport.validate(obj)
         if (!valid) console.log(JSON.stringify(validate.errors))
         return valid
     }

@@ -9,13 +9,12 @@ let a = new EvaluationReport();
     console.log(EvaluationReport.validate(sample))
     let evaluationReport = new EvaluationReport();
     let request = JSON.parse(fs.readFileSync('../../APIs/schemas/PEARL/samples/ex_request.json', { encoding: 'utf8', flag: 'r' }))
-    evaluationReport.setRequest(request)
-    console.log(evaluationReport.request)
+    console.log(evaluationReport.setRequest(request))
+
     let reply = JSON.parse(fs.readFileSync('../../APIs/schemas/PEARL/samples/ex_reply.json', { encoding: 'utf8', flag: 'r' }))
-    evaluationReport.setReply(reply)
-    console.log(evaluationReport.reply)
-    console.log(EvaluationReport.validate(sample))
-    evaluationReport.setId(3)
+    console.log(evaluationReport.setReply(reply))
+    console.log(EvaluationReport.isValidate(sample))
+    console.log(evaluationReport.setId(3))
 
 
 

@@ -16,7 +16,7 @@ let a = new ProgrammingExercise();
         console.log(a.setTests(a.tests))*/
     let exercise_obj = new ProgrammingExercise()
     await exercise_obj.load_remote_exercise('e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7')
-
+    console.log(ProgrammingExercise.isValid(exercise_obj))
 
 
 

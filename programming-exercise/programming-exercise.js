@@ -24,11 +24,7 @@ const addFormats = require("ajv-formats")
 //Adding some formats needed to yapexil.schema.json be valid
 addFormats(ajv, ["date", "time", "date-time"]);
 path.resolve(__dirname, 'settings.json');
-/****************************************************************/
-//Static variables
-var validate;
-var JWT_TOKEN;
-/****************************************************************/
+
 /****************************************************************/
 const Common_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/Common.json', { encoding: 'utf8', flag: 'r' }))
 const YAPEXIL_RESOURCE_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_RESOURCE.json', { encoding: 'utf8', flag: 'r' }))
@@ -38,10 +34,9 @@ const YAPEXIL_SOLUTIONS_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/
 const YAPEXIL_STATEMENTS_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_STATEMENTS.json', { encoding: 'utf8', flag: 'r' }))
 const YAPEXIL_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL.json', { encoding: 'utf8', flag: 'r' }))
 
-var validate = ajv.addSchema(Common_schema).addSchema(YAPEXIL_RESOURCE_schema).addSchema(YAPEXIL_TESTS_schema).addSchema(YAPEXIL_TEST_SET_schema).addSchema(YAPEXIL_SOLUTIONS_schema).addSchema(YAPEXIL_STATEMENTS_schema).compile(YAPEXIL_schema)
-
 /****************************************************************/
-
+var JWT_TOKEN;
+/****************************************************************/
 /** @function do_auth
  *  
  * Internal function to does the authentication
@@ -64,8 +59,10 @@ async function do_auth() {
  */
 
 module.exports = class ProgrammingExercise {
+    static validate = ajv.addSchema(Common_schema).addSchema(YAPEXIL_RESOURCE_schema).addSchema(YAPEXIL_TESTS_schema).addSchema(YAPEXIL_TEST_SET_schema).addSchema(YAPEXIL_SOLUTIONS_schema).addSchema(YAPEXIL_STATEMENTS_schema).compile(YAPEXIL_schema)
+
     constructor(exercise) {
-        if (exercise != undefined && ProgrammingExercise.validate(exercise))
+        if (exercise != undefined && ProgrammingExercise.isValid(exercise))
             Object.assign(this, exercise)
 
     }
@@ -139,33 +136,33 @@ module.exports = class ProgrammingExercise {
         return falses
     }
     setTests(tests) {
-        validate = ajv.compile(YAPEXIL_TESTS_schema)
-        if (validate(tests)) {
+        ProgrammingExercise.validate = ajv.compile(YAPEXIL_TESTS_schema)
+        if (ProgrammingExercise.validate(tests)) {
             this.tests = tests
             return true
         }
         console.log(tests)
-        console.log(JSON.stringify(validate.errors))
+        console.log(JSON.stringify(ProgrammingExercise.validate.errors))
         return false
 
     }
     setSolutions(solutions) {
-        validate = ajv.compile(YAPEXIL_SOLUTIONS_schema)
+        ProgrammingExercise.validate = ajv.compile(YAPEXIL_SOLUTIONS_schema)
 
-        if (validate(solutions)) {
+        if (ProgrammingExercise.validate(solutions)) {
             this.solutions = solutions
             return true
         }
-        console.log(JSON.stringify(validate.errors))
+        console.log(JSON.stringify(ProgrammingExercise.validate.errors))
         return false
     }
     setStatements(statements) {
-        validate = ajv.compile(YAPEXIL_STATEMENTS_schema)
-        if (validate(statements)) {
+        ProgrammingExercise.validate = ajv.compile(YAPEXIL_STATEMENTS_schema)
+        if (ProgrammingExercise.validate(statements)) {
             this.statements = statements
             return true
         }
-        console.log(JSON.stringify(validate.errors))
+        console.log(JSON.stringify(ProgrammingExercise.validate.errors))
 
         return false
     }
@@ -285,10 +282,10 @@ module.exports = class ProgrammingExercise {
      *  
      * This function makes an evaluation from an object using the schema loaded by the function setup_validate()
      *   */
-    static validate(obj) {
-        validate = ajv.compile(YAPEXIL_schema)
-        const valid = validate(obj)
-        if (!valid) console.log(JSON.stringify(validate.errors))
+    static isValid(obj) {
+        ProgrammingExercise.validate = ajv.compile(YAPEXIL_schema)
+        const valid = ProgrammingExercise.validate(obj)
+        if (!valid) console.log(JSON.stringify(ProgrammingExercise.validate.errors))
         return valid
 
     }

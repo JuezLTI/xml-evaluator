@@ -22,7 +22,7 @@ describe('Test for ProgrammingExercise', async function() {
     it('Testing metadata of an exercise fetched using authokit-api ', async function() {
         let exercise_obj = new ProgrammingExercise()
         await exercise_obj.load_remote_exercise('e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7')
-        expect(ProgrammingExercise.validate(exercise_obj)).to.equal(true);
+        expect(ProgrammingExercise.isValid(exercise_obj)).to.equal(true);
 
     })
 
@@ -30,7 +30,7 @@ describe('Test for ProgrammingExercise', async function() {
         let exercise_list = await ProgrammingExercise.deserialize(path.join(__dirname, 'resources'))
         for (let exercise of exercise_list) {
             let exercise_obj = new ProgrammingExercise(exercise)
-            expect(ProgrammingExercise.validate(exercise_obj)).to.equal(true);
+            expect(ProgrammingExercise.isValid(exercise_obj)).to.equal(true);
         }
 
     })
@@ -41,7 +41,7 @@ describe('Test for ProgrammingExercise', async function() {
         exercise_list = await ProgrammingExercise.deserialize(path.join(__dirname, 'resources'))
         for (let exercise of exercise_list) {
             exercise_obj = new ProgrammingExercise(exercise)
-            expect(ProgrammingExercise.validate(exercise_obj)).to.equal(true);
+            expect(ProgrammingExercise.isValid(exercise_obj)).to.equal(true);
         }
 
     })
