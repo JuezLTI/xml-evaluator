@@ -4,6 +4,9 @@ const Ajv = require("ajv")
 const ajv = new Ajv()
 const addFormats = require("ajv-formats")
 addFormats(ajv, ["date", "time", "date-time"])
+const fs = require('fs')
+const path = require('path');
+const CONST = require('./CONST')
 
 const base64 = require('base64topdf');
 let a = new ProgrammingExercise();
@@ -15,9 +18,13 @@ let a = new ProgrammingExercise();
         console.log(a.setStatements(a.statements))
         console.log(a.setTests(a.tests))*/
     let exercise_obj = new ProgrammingExercise()
-    await exercise_obj.load_remote_exercise('e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7')
-    console.log(ProgrammingExercise.isValid(exercise_obj))
-
-
+    await exercise_obj.load_remote_exercise(`${CONST.BASE_URL}/exercises/60e038a4-f3ee-4229-899d-549509aedd73`)
+    console.log(exercise_obj.solutions_contents)
+        /*  exercise_obj.setId(1)
+          exercise_obj.setKeywords(["XML", "XPATH"])
+          exercise_obj.setSolutions([{ "pathname": "solutions.js", "lang": "javaScript" }])
+          exercise_obj.setSolutions_contents(fs.readFileSync(path.join(__dirname, `/temp/${exercise_obj.solutions[0].pathname}`)))
+          exercise_obj.setStatements([{ "pathname": "statement.html", "nat_lang": "en", "format": "HTML" }])
+          exercise_obj.setStatements_contents(fs.readFileSync(path.join(__dirname, `/temp/${exercise_obj.statements[0].pathname}`)))*/
 
 })()

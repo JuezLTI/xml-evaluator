@@ -15,7 +15,7 @@ describe('Authorkit tests', function() {
     describe('Exercises', function() {
         it('Get exercise by its id ', async function() {
             const exercise_id = "60e038a4-f3ee-4229-899d-549509aedd73"
-            const a = await api.getExercise(CONST.BASE_URL, JWT_TOKEN, exercise_id)
+            const a = await api.getExercise(CONST.BASE_URL, JWT_TOKEN, `${CONST.BASE_URL}/exercises/${exercise_id}`)
             const cmd = `curl -X 'GET' \
       '${CONST.BASE_URL}/exercises/${exercise_id}?join=statements&join=instructions&join=solutions&join=tests' \
       -H 'accept: applicaiton/json' \

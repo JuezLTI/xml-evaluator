@@ -48,7 +48,7 @@ async function getAllExercise(baseUrl, token, projectId) {
         .json()
 }
 
-async function getExercise(baseUrl, token, id, normalize) {
+async function getExercise(baseUrl, token, URI, normalize) {
     const searchParams = new URLSearchParams()
     searchParams.append('join', 'statements')
     searchParams.append('join', 'instructions')
@@ -56,7 +56,7 @@ async function getExercise(baseUrl, token, id, normalize) {
     searchParams.append('join', 'tests')
 
     let data = await got
-        .get(`${baseUrl}/exercises/${id}`, {
+        .get(URI, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -126,6 +126,7 @@ async function getSolutionContents(baseUrl, token, id) {
     return b64decode(b64contents)
 }
 async function getInputContents(baseUrl, token, id) {
+
     const b64contents = await got.get(`${baseUrl}/tests/${id}/input/contents`, {
         headers: {
             Authorization: `Bearer ${token}`,

@@ -141,7 +141,6 @@ module.exports = class ProgrammingExercise {
             this.tests = tests
             return true
         }
-        console.log(tests)
         console.log(JSON.stringify(ProgrammingExercise.validate.errors))
         return false
 
@@ -216,14 +215,14 @@ module.exports = class ProgrammingExercise {
          *  
          * This function will load an exercise coming from authorkit API in this class 
          *  @param {string} ID  The exercise ID   */
-    async load_remote_exercise(ID) {
+    async load_remote_exercise(URI) {
         await do_auth()
         try {
 
             const YAPExILData = await api.getExercise(
                 CONST.BASE_URL,
                 JWT_TOKEN,
-                ID,
+                URI,
                 true
             )
             Object.assign(this, YAPExILData)
@@ -232,44 +231,60 @@ module.exports = class ProgrammingExercise {
             // If this exercise is coming through the authokit lets get some data that are missing
             // set statments content of the exercise
             this.statements_contents = []
-            for (let metadata_statment of this.statements) {
-                let decode = metadata_statment.format == "pdf" ? false : true
-                this.statements_contents[metadata_statment.id] = await api.getStatementContents(
-                    CONST.BASE_URL,
-                    JWT_TOKEN,
-                    metadata_statment.id,
-                    decode
-                )
+            try {
+                for (let metadata_statment of this.statements) {
+                    let decode = metadata_statment.format == "pdf" ? false : true
+                    this.statements_contents[metadata_statment.id] = await api.getStatementContents(
+                        CONST.BASE_URL,
+                        JWT_TOKEN,
+                        metadata_statment.id,
+                        decode
+                    )
+                }
+            } catch (e) {
+                console.log(`error when trying to get statements contetns \n ${e}`)
             }
 
-            // set solutions content of the exercise
-            this.solutions_contents = []
-            for (let metadata_solutions of this.solutions) {
-                this.solutions_contents[metadata_solutions.id] = await api.getSolutionContents(
-                    CONST.BASE_URL,
-                    JWT_TOKEN, metadata_solutions.id
-                )
+            try {
+                // set solutions content of the exercise
+                this.solutions_contents = []
+                for (let metadata_solutions of this.solutions) {
+                    this.solutions_contents[metadata_solutions.id] = await api.getSolutionContents(
+                        CONST.BASE_URL,
+                        JWT_TOKEN, metadata_solutions.id
+                    )
+                }
+
+            } catch (e) {
+                console.log(`error when trying to get solutions contetns \n ${e}`)
             }
+            try {
+                // set output test content of the exercise
+                this.tests_contents_out = []
+                for (let metadata_tests of this.tests) {
+                    let data = await api.getOutputContents(
+                        CONST.BASE_URL,
+                        JWT_TOKEN,
+                        metadata_tests.id,
+                    )
+                    this.tests_contents_out[metadata_tests.id] = data
 
-
-            // set output test content of the exercise
-            this.tests_contents_out = []
-            for (let metadata_tests of this.tests) {
-                this.tests_contents_out[metadata_tests.id] = await api.getOutputContents(
-                    CONST.BASE_URL,
-                    JWT_TOKEN,
-                    metadata_tests.id,
-                )
+                }
+            } catch (e) {
+                console.log(`error when trying to get tests_out contetns \n ${e}`)
             }
-
-            // set input test content of the exercise
-            this.tests_contents_in = []
-            for (let metadata_tests of this.tests) {
-                this.tests_contents_in[metadata_tests.id] = await api.getInputContents(
-                    CONST.BASE_URL,
-                    JWT_TOKEN,
-                    metadata_tests.id,
-                )
+            try {
+                // set input test content of the exercise
+                this.tests_contents_in = []
+                for (let metadata_tests of this.tests) {
+                    this.tests_contents_in[metadata_tests.id] = await api.getInputContents(
+                        CONST.BASE_URL,
+                        JWT_TOKEN,
+                        metadata_tests.id,
+                    )
+                }
+            } catch (e) {
+                console.log(`error when trying to get tests_in contetns \n ${e}`)
             }
             /**************************************************************************************************/
         } catch (err) {

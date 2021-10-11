@@ -36,7 +36,10 @@ module.exports = class EvaluationReport {
         EvaluationReport.validate = ajv.compile(PEARL_REQUEST_schema)
         if (EvaluationReport.validate(request)) {
             this.request = {}
-            this.request.date = request.date
+            if ('date' in request) {
+                this.request.date = request.date
+            } else return false
+
             if ('program' in request) {
                 this.request.program = request.program
                 this.request.learningObject = request.learningObject
