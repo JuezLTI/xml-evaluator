@@ -7,11 +7,16 @@
 
 
 const zip_a_folder = require('zip-a-folder');
+
+const stream = require('stream');
+const os = require("os");
+const fs = require('fs')
+const { promisify } = require('util');
+const got = require('got');
+const pipeline = promisify(stream.pipeline);
 const readChunk = require('read-chunk');
 const extract = require('extract-zip')
-const api = require('./authorkit-api')
 const CONST = require('./CONST')
-const fs = require('fs')
 const fileType = require('file-type');
 const rimraf = require("rimraf");
 const path = require('path');
@@ -45,13 +50,63 @@ async function do_auth() {
     if (JWT_TOKEN === undefined) {
         try {
             JWT_TOKEN = (
-                await api.login(CONST.BASE_URL, CONST.EMAIL, CONST.PASSWORD)
+                await got.post(`${CONST.BASE_URL}/auth/login`, {
+                    json: {
+                        "email": `${CONST.EMAIL}`,
+                        "password": `${CONST.PASSWORD}`,
+                    },
+                    resolveBodyOnly: true,
+                    responseType: 'json',
+                })
             ).accessToken
         } catch (err) {
             console.log(err)
         }
     }
 }
+
+function normalizeData(data) {
+    /**************************************************************************************************/
+    //NORMALIZING DATA FETCHED BY URI  
+    //the data coming to the author kit API need to be changed to pass in AJV test
+    for (let i in data.statements)
+        data.statements[i].format = data.statements[i].format.toUpperCase()
+    for (let i in data.tests)
+        data.tests[i].weight = parseInt(data.tests[i].weight)
+
+
+    if ("difficulty" in data)
+        data.difficulty = data.difficulty.toUpperCase()
+
+    if (!("title" in data))
+        data.title = "BLANK"
+    if (!("author" in data))
+        data.author = "anonymous"
+    if (!("keywords" in data))
+        data.keywords = []
+    if (!("status" in data))
+        data.status = "DRAFT"
+    else {
+        data.status = data.status.toUpperCase()
+    }
+    if (!("type" in data))
+        data.type = "BLANK_SHEET"
+    else {
+        data.type = data.type.toUpperCase()
+    }
+
+
+
+
+
+
+
+    /**************************************************************************************************/
+}
+
+
+
+
 
 /**
  * Creates a new ProgrammingExercise.
@@ -62,8 +117,11 @@ module.exports = class ProgrammingExercise {
     static validate = ajv.addSchema(Common_schema).addSchema(YAPEXIL_RESOURCE_schema).addSchema(YAPEXIL_TESTS_schema).addSchema(YAPEXIL_TEST_SET_schema).addSchema(YAPEXIL_SOLUTIONS_schema).addSchema(YAPEXIL_STATEMENTS_schema).compile(YAPEXIL_schema)
 
     constructor(exercise) {
-        if (exercise != undefined && ProgrammingExercise.isValid(exercise))
+        if (exercise != undefined) {
+            normalizeData(exercise)
             Object.assign(this, exercise)
+        }
+
 
     }
     setId(id) {
@@ -129,7 +187,7 @@ module.exports = class ProgrammingExercise {
         return false
     }
     setCreated_at(created_at) {
-        if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(date)) {
+        if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(created_at)) {
             this.created_at = created_at
             return true
         }
@@ -156,32 +214,19 @@ module.exports = class ProgrammingExercise {
         return false
     }
     setStatements(statements) {
-        ProgrammingExercise.validate = ajv.compile(YAPEXIL_STATEMENTS_schema)
-        if (ProgrammingExercise.validate(statements)) {
-            this.statements = statements
-            return true
+            ProgrammingExercise.validate = ajv.compile(YAPEXIL_STATEMENTS_schema)
+            if (ProgrammingExercise.validate(statements)) {
+                this.statements = statements
+                return true
+            }
+            console.log(JSON.stringify(ProgrammingExercise.validate.errors))
+
+            return false
         }
-        console.log(JSON.stringify(ProgrammingExercise.validate.errors))
-
-        return false
-    }
-    setTests_contents_in(tests_contents_in) {
-        this.tests_contents_in = tests_contents_in
-    }
-    setTests_contents_out(tests_contents_out) {
-        this.tests_contents_out = tests_contents_out
-    }
-    setSolutions_contents(solutions_contents) {
-        this.solutions_contents = solutions_contents
-    }
-    setStatements_contents(statements_contents) {
-        this.statements_contents = statements_contents
-    }
-
-    /** @function getDescription
-     *  
-     * This function returns the an object list  with an  question statement and the format 
-     *  */
+        /** @function getDescription
+         *  
+         * This function returns the an object list  with an  question statement and the format 
+         *  */
     getDescription() {
             let list = this.statements.map((data) => {
                 let obj = { type: data.format, content: this.statements_contents[data.id] }
@@ -215,80 +260,44 @@ module.exports = class ProgrammingExercise {
          *  
          * This function will load an exercise coming from authorkit API in this class 
          *  @param {string} ID  The exercise ID   */
-    async load_remote_exercise(URI) {
+    async load_remote_exercise_authorkit(ID) {
         await do_auth()
         try {
+            const tempDir = os.tmpdir();
+            await pipeline(
+                got.stream(`${CONST.BASE_URL}/exercises/${ID}/export`, {
+                    headers: {
+                        Authorization: `Bearer ${JWT_TOKEN}`,
+                    }
+                }),
+                fs.createWriteStream(path.join(tempDir, "response.zip"))
+            );
+            let data = await ProgrammingExercise.deserialize(tempDir);
+            normalizeData(data)
+            Object.assign(this, data)
+        } catch (error) {
+            console.log(error)
+        }
 
-            const YAPExILData = await api.getExercise(
-                CONST.BASE_URL,
-                JWT_TOKEN,
-                URI,
-                true
-            )
-            Object.assign(this, YAPExILData)
+    }
 
 
-            // If this exercise is coming through the authokit lets get some data that are missing
-            // set statments content of the exercise
-            this.statements_contents = []
-            try {
-                for (let metadata_statment of this.statements) {
-                    let decode = metadata_statment.format == "pdf" ? false : true
-                    this.statements_contents[metadata_statment.id] = await api.getStatementContents(
-                        CONST.BASE_URL,
-                        JWT_TOKEN,
-                        metadata_statment.id,
-                        decode
-                    )
-                }
-            } catch (e) {
-                console.log(`error when trying to get statements contetns \n ${e}`)
-            }
 
-            try {
-                // set solutions content of the exercise
-                this.solutions_contents = []
-                for (let metadata_solutions of this.solutions) {
-                    this.solutions_contents[metadata_solutions.id] = await api.getSolutionContents(
-                        CONST.BASE_URL,
-                        JWT_TOKEN, metadata_solutions.id
-                    )
-                }
-
-            } catch (e) {
-                console.log(`error when trying to get solutions contetns \n ${e}`)
-            }
-            try {
-                // set output test content of the exercise
-                this.tests_contents_out = []
-                for (let metadata_tests of this.tests) {
-                    let data = await api.getOutputContents(
-                        CONST.BASE_URL,
-                        JWT_TOKEN,
-                        metadata_tests.id,
-                    )
-                    this.tests_contents_out[metadata_tests.id] = data
-
-                }
-            } catch (e) {
-                console.log(`error when trying to get tests_out contetns \n ${e}`)
-            }
-            try {
-                // set input test content of the exercise
-                this.tests_contents_in = []
-                for (let metadata_tests of this.tests) {
-                    this.tests_contents_in[metadata_tests.id] = await api.getInputContents(
-                        CONST.BASE_URL,
-                        JWT_TOKEN,
-                        metadata_tests.id,
-                    )
-                }
-            } catch (e) {
-                console.log(`error when trying to get tests_in contetns \n ${e}`)
-            }
-            /**************************************************************************************************/
-        } catch (err) {
-            console.log(err)
+    async load_remote_exercise(URI) {
+        try {
+            const tempDir = os.tmpdir();
+            await pipeline(
+                got.stream(URI, {
+                    headers: {
+                        Authorization: `Bearer ${JWT_TOKEN}`,
+                    }
+                }),
+                fs.createWriteStream(path.join(tempDir, "response.zip"))
+            );
+            let data = await ProgrammingExercise.deserialize(tempDir);
+            Object.assign(this, data)
+        } catch (error) {
+            console.log(error)
         }
 
     }
@@ -311,70 +320,98 @@ module.exports = class ProgrammingExercise {
      *   @param {string} p The string that represents the path where this function will output the zip file, if none path is passed the default folder is the "serialized" folder under the current directory
      *  
      *   */
-    async serialize(p = serialized_path()) {
-
-            const directory = path.join(__dirname, this.id)
-
-            if (!fs.existsSync(directory)) {
-                fs.mkdirSync(directory);
-                fs.writeFileSync(path.join(directory, "metadata.txt"), JSON.stringify(this, null, '\t'), {
-                    encoding: "utf8",
-                });
-
-                /*************************************************************************************************************************/
-                // Creating directories [solution,tests,statements]
-                // Under each one of these directories will have the metadata information as well the concreted content 
-                const directory_solutions = path.join(directory, "solutions")
-                if (!fs.existsSync(directory_solutions)) {
-                    fs.mkdirSync(directory_solutions);
-                    fs.writeFileSync(path.join(directory_solutions, "metadata.txt"), JSON.stringify(this.solutions, null, '\t'), {
-                        encoding: "utf8",
-                    });
-                    for (let metadata_solutions of this.solutions) {
-                        fs.writeFileSync(path.join(directory_solutions, metadata_solutions.pathname), this.solutions_contents[metadata_solutions.id], {
-                            encoding: "utf8",
-                        });
-                    }
-                }
-                const directory_tests = path.join(directory, "tests")
-                if (!fs.existsSync(directory_tests)) {
-                    fs.mkdirSync(directory_tests);
-                    fs.writeFileSync(path.join(directory_solutions, "metadata.txt"), JSON.stringify(this.tests, null, '\t'), {
-                        encoding: "utf8",
-                    });
-                    for (let metadata_tests of this.tests) {
-                        fs.writeFileSync(path.join(directory_tests, metadata_tests.input), this.tests_contents_in[metadata_tests.id], {
-                            encoding: "utf8",
-                        });
-                        fs.writeFileSync(path.join(directory_tests, metadata_tests.output), this.tests_contents_out[metadata_tests.id], {
-                            encoding: "utf8",
-                        });
-                    }
-                }
-                const directory_statements = path.join(directory, "statements")
-                if (!fs.existsSync(directory_statements)) {
-                    fs.mkdirSync(directory_statements);
-                    fs.writeFileSync(path.join(directory_statements, "metadata.txt"), JSON.stringify(this.statements, null, '\t'), {
-                        encoding: "utf8",
-                    });
-                    for (let metadata_statments of this.statements) {
-                        if (metadata_statments.format != "pdf")
-                            fs.writeFileSync(path.join(directory_statements, metadata_statments.pathname), this.statements_contents[metadata_statments.id], {
-                                encoding: "utf8",
-                            });
-                        else
-                            base64topdf.base64Decode(this.statements_contents[metadata_statments.id], path.join(directory_statements, metadata_statments.pathname));
-
-                    }
-                }
-                /*************************************************************************************************************************/
-                // make a zip if these folders 
-                let file_zip_name = path.join(p, this.id)
-                await zip_a_folder.zip(directory, `${file_zip_name}.zip`);
-                // deleting the folder created for auxiliary at the  zip process 
-                // I tried with fs.rmdirSync but did not work 
+    async serialize(p = serializedPath()) {
+            const directory = path.join(p, this.id)
+            if (fs.existsSync(directory)) {
                 rimraf.sync(directory)
+
             }
+            fs.mkdirSync(directory);
+            let aux = {}
+            Object.assign(aux, this)
+            delete aux.tests_contents_in;
+            delete aux.tests_contents_out;
+            delete aux.statements_contents;
+            delete aux.solutions_contents;
+            delete aux.solutions;
+            delete aux.statements;
+            delete aux.tests;
+
+            fs.writeFileSync(path.join(directory, "metadata.json"), JSON.stringify(aux, null, '\t'), {
+                encoding: "utf8",
+            });
+
+            /*************************************************************************************************************************/
+            // Creating directories [solution,tests,statements]
+            // Under each one of these directories will have the metadata information as well the concreted content 
+            const directory_solutions = path.join(directory, "solutions")
+            if (!fs.existsSync(directory_solutions)) {
+                fs.mkdirSync(directory_solutions);
+
+                for (let metadata_solutions of this.solutions) {
+                    let directory_solutions_id = path.join(directory_solutions, metadata_solutions.id)
+                    fs.mkdirSync(directory_solutions_id);
+                    fs.writeFileSync(path.join(directory_solutions_id, "metadata.json"), JSON.stringify(metadata_solutions, null, '\t'), {
+                        encoding: "utf8",
+                        flag: 'wx'
+                    });
+                    fs.writeFileSync(path.join(directory_solutions_id, metadata_solutions.pathname), this.solutions_contents[metadata_solutions.id], {
+                        encoding: "utf8",
+                    });
+                }
+            }
+            const directory_tests = path.join(directory, "tests")
+            if (!fs.existsSync(directory_tests)) {
+                fs.mkdirSync(directory_tests);
+
+                for (let metadata_tests of this.tests) {
+                    let directory_tests_id = path.join(directory_tests, metadata_tests.id)
+                    fs.mkdirSync(directory_tests_id);
+
+                    fs.writeFileSync(path.join(directory_tests_id, "metadata.json"), JSON.stringify(metadata_tests, null, '\t'), {
+                        encoding: "utf8",
+                        flag: 'wx'
+                    });
+                    fs.writeFileSync(path.join(directory_tests_id, metadata_tests.input), this.tests_contents_in[metadata_tests.id], {
+                        encoding: "utf8",
+                        flag: 'wx'
+                    });
+                    fs.writeFileSync(path.join(directory_tests_id, metadata_tests.output), this.tests_contents_out[metadata_tests.id], {
+                        encoding: "utf8",
+                        flag: 'wx'
+                    });
+                }
+            }
+            const directory_statements = path.join(directory, "statements")
+            if (!fs.existsSync(directory_statements)) {
+                fs.mkdirSync(directory_statements);
+
+                for (let metadata_statements of this.statements) {
+                    let directory_statements_id = path.join(directory_statements, metadata_statements.id)
+                    fs.mkdirSync(directory_statements_id);
+
+                    fs.writeFileSync(path.join(directory_statements_id, "metadata.json"), JSON.stringify(metadata_statements, null, '\t'), {
+                        encoding: "utf8",
+                        flag: 'wx'
+                    });
+                    if (metadata_statements.format != "pdf")
+                        fs.writeFileSync(path.join(directory_statements_id, metadata_statements.pathname), this.statements_contents[metadata_statements.id], {
+                            encoding: "utf8",
+                            flag: 'wx'
+                        });
+                    else
+                        base64topdf.base64Decode(this.statements_contents[metadata_statements.id], path.join(directory_statements_id, metadata_statements.pathname));
+
+                }
+            }
+            /*************************************************************************************************************************/
+            // make a zip if these folders 
+            let file_zip_name = path.join(p, this.id)
+            await zip_a_folder.zip(directory, `${file_zip_name}.zip`);
+            // deleting the folder created for auxiliary at the  zip process 
+            // I tried with fs.rmdirSync but did not work 
+            rimraf.sync(directory)
+
         }
         /** @function  deserialize
          * 
@@ -382,92 +419,96 @@ module.exports = class ProgrammingExercise {
          *   @param {string} p The string that represents the path where this function will read the zip file, if none path is passed the default folder is the "serialized" folder under the current directory
          *  
          *   */
-    static async deserialize(p = serialized_path()) {
-        var exercise_list = []
-        let files = fs.readdirSync(p)
-        for (let exercise_zip_name of files) {
-            var n_programming_exercise = Object.create(null);
-            var file_path = path.join(p, exercise_zip_name)
-
+    static async deserialize(p = serializedPath(), filename = "response.zip") {
+        var n_programming_exercise = {}
             //deleting the .zip from the name
-            exercise_zip_name = exercise_zip_name.replace(/\.[^/.]+$/, "")
+        var file_path = path.join(p, filename)
 
-            // these lines will to check if the current file is a zip file
-            const buffer = readChunk.sync(file_path, 0, 4100);
-            let type = await fileType.fromBuffer(buffer)
-            if (type != undefined && type.ext === 'zip') {
+        filename = filename.replace(/\.[^/.]+$/, "")
 
-                try {
-                    /************************************************************************************************************/
-                    //getting the main metadata  in the root of the folder
-                    let unzip_path = path.join(temp_path(), exercise_zip_name)
-                    await extract(file_path, { dir: unzip_path })
-                    let metadata = fs.readFileSync(path.join(unzip_path, 'metadata.txt'), { encoding: 'utf8', flag: 'r' });
-                    n_programming_exercise = Object.assign(this, JSON.parse(metadata))
-                    let solutions_path = path.join(unzip_path, 'solutions')
+        // these lines will to check if the current file is a zip file
+        const buffer = readChunk.sync(file_path, 0, 4100);
+        let type = await fileType.fromBuffer(buffer)
+        if (type != undefined && type.ext === 'zip') {
 
+            try {
+                /************************************************************************************************************/
+                //getting the main metadata  in the root of the folder
+                let unzip_path = path.join(os.tmpdir(), filename)
+                await extract(file_path, { dir: unzip_path })
+                let n_programming_exercise = JSON.parse(fs.readFileSync(path.join(unzip_path, 'metadata.json'), { encoding: 'utf8', flag: 'r' }));
+                n_programming_exercise.solutions = []
+                n_programming_exercise.tests = []
+                n_programming_exercise.statements = []
 
+                /************************************************************************************************************/
+                //The walks of  all folders and retrieve information to build one Instance of the class ProgrammingExercise
+                let solutions_path = path.join(unzip_path, 'solutions')
 
-
-                    /************************************************************************************************************/
-                    //The walks of  all folders and retrieve information to build one Instance of the class ProgrammingExercise
-                    if (fs.existsSync(solutions_path)) {
-                        for (let metadata_solutions of n_programming_exercise['solutions']) {
-                            let solution = fs.readFileSync(path.join(solutions_path, metadata_solutions.pathname), { encoding: 'utf8', flag: 'r' });
-                            n_programming_exercise.solutions_contents[metadata_solutions.id] = solution
-
-
-                        }
+                n_programming_exercise.solutions_contents = {}
+                if (fs.existsSync(solutions_path)) {
+                    let folders = fs.readdirSync(solutions_path)
+                    for (let folder of folders) {
+                        let solutions_path_id = path.join(solutions_path, folder)
+                        let metadata = JSON.parse(fs.readFileSync(path.join(solutions_path_id, "metadata.json"), { encoding: 'utf8', flag: 'r' }))
+                        n_programming_exercise.solutions.push(metadata)
+                        let solution = fs.readFileSync(path.join(solutions_path_id, metadata.pathname), { encoding: 'utf8', flag: 'r' });
+                        n_programming_exercise.solutions_contents[metadata.id] = solution
                     }
-
-                    let tests_path = path.join(unzip_path, 'tests')
-                    if (fs.existsSync(tests_path)) {
-
-                        for (let metadata_tests of n_programming_exercise['tests']) {
-                            let test_in = fs.readFileSync(path.join(tests_path, metadata_tests.input), { encoding: 'utf8', flag: 'r' });
-                            n_programming_exercise.tests_contents_in[metadata_tests.id] = test_in
-                        }
-
-                        for (let metadata_tests of n_programming_exercise['tests']) {
-                            let test_out = fs.readFileSync(path.join(tests_path, metadata_tests.output), { encoding: 'utf8', flag: 'r' });
-                            n_programming_exercise.tests_contents_out[metadata_tests.id] = test_out
-                        }
-
-                    }
-
-                    let statement_path = path.join(unzip_path, 'statements')
-                    if (fs.existsSync(statement_path)) {
-                        for (let metadata_statement of n_programming_exercise['statements']) {
-                            if (metadata_statement.format != 'pdf') {
-                                let statement = fs.readFileSync(path.join(statement_path, metadata_statement.pathname), { encoding: 'utf8', flag: 'r' });
-                                n_programming_exercise.statements_contents[metadata_statement.id] = statement
-                            } else {
-                                let statement = fs.readFileSync(path.join(statement_path, metadata_statement.pathname), { encoding: 'base64', flag: 'r' });
-                                n_programming_exercise.statements_contents[metadata_statement.id] = statement
-
-                            }
-                        }
-                    }
-                    /************************************************************************************************************/
-                    exercise_list.push(n_programming_exercise)
-                } catch (err) {
-                    console.log(err)
                 }
+                let tests_path = path.join(unzip_path, 'tests')
+
+                n_programming_exercise.tests_contents_in = {}
+                n_programming_exercise.tests_contents_out = {}
+                if (fs.existsSync(tests_path)) {
+                    let folders = fs.readdirSync(tests_path)
+                    for (let folder of folders) {
+                        let tests_path_id = path.join(tests_path, folder)
+                        let metadata = JSON.parse(fs.readFileSync(path.join(tests_path_id, "metadata.json"), { encoding: 'utf8', flag: 'r' }))
+                        n_programming_exercise.tests.push(metadata)
+                        let tests_in = fs.readFileSync(path.join(tests_path_id, metadata.input), { encoding: 'utf8', flag: 'r' });
+                        let tests_out = fs.readFileSync(path.join(tests_path_id, metadata.output), { encoding: 'utf8', flag: 'r' });
+                        n_programming_exercise.tests_contents_in[metadata.id] = tests_in
+                        n_programming_exercise.tests_contents_out[metadata.id] = tests_out
+
+                    }
+                }
+                /************************************************************************************************************/
+                let statement_path = path.join(unzip_path, 'statements')
+
+
+                n_programming_exercise.statements_contents = {}
+                if (fs.existsSync(statement_path)) {
+                    let folders = fs.readdirSync(statement_path)
+                    for (let folder of folders) {
+                        let statement_path_id = path.join(statement_path, folder)
+                        let metadata = JSON.parse(fs.readFileSync(path.join(statement_path_id, "metadata.json"), { encoding: 'utf8', flag: 'r' }))
+                        n_programming_exercise.statements.push(metadata)
+                        let statement = fs.readFileSync(path.join(statement_path_id, metadata.pathname), { encoding: 'utf8', flag: 'r' });
+                        n_programming_exercise.statements_contents[metadata.id] = statement
+                    }
+                }
+                /************************************************************************************************************/
+                let obj = (new ProgrammingExercise(n_programming_exercise))
+
+                return obj
+            } catch (err) {
+                console.log(err)
             }
+            return {}
+
         }
-        return exercise_list
+
+
+
+
     }
-    to_string() {
+    toString() {
         return JSON.stringify(this)
     }
 }
 
-function serialized_path() {
+function serializedPath() {
     return path.join(__dirname, 'serialized')
-
-}
-
-function temp_path() {
-    return path.join(__dirname, 'temp')
 
 }

@@ -1,9 +1,7 @@
 programming-exercise/node_modules/
-programming-exercise/serialized/
-programming-exercise/temp/
+programming-exercise/serialized/*
 evaluation-report/node_modules/
-evaluator/node_modules/
+server/node_modules/
 tests/node_modules/
-tests/resources/
-tests/docs/
+tests/resources/*
 
