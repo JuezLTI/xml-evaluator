@@ -7,7 +7,6 @@
 
 
 const zip_a_folder = require('zip-a-folder');
-
 const stream = require('stream');
 const os = require("os");
 const fs = require('fs')
@@ -22,22 +21,16 @@ const rimraf = require("rimraf");
 const path = require('path');
 const base64topdf = require('base64topdf');
 const Ajv = require("ajv")
-const ajv = new Ajv()
 const addFormats = require("ajv-formats")
-
+const ajv = new Ajv()
+addFormats(ajv);
 /****************************************************************/
 //Adding some formats needed to yapexil.schema.json be valid
 addFormats(ajv, ["date", "time", "date-time"]);
 path.resolve(__dirname, 'settings.json');
 
 /****************************************************************/
-const Common_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/Common.json', { encoding: 'utf8', flag: 'r' }))
-const YAPEXIL_RESOURCE_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_RESOURCE.json', { encoding: 'utf8', flag: 'r' }))
-const YAPEXIL_TEST_SET_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_TEST_SET.json', { encoding: 'utf8', flag: 'r' }))
-const YAPEXIL_TESTS_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_TESTS.json', { encoding: 'utf8', flag: 'r' }))
-const YAPEXIL_SOLUTIONS_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_SOLUTIONS.json', { encoding: 'utf8', flag: 'r' }))
-const YAPEXIL_STATEMENTS_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL_STATEMENTS.json', { encoding: 'utf8', flag: 'r' }))
-const YAPEXIL_schema = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL.json', { encoding: 'utf8', flag: 'r' }))
+const YAPEXIL = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL.json', { encoding: 'utf8', flag: 'r' }))
 
 /****************************************************************/
 var JWT_TOKEN;
@@ -104,28 +97,57 @@ function normalizeData(data) {
     /**************************************************************************************************/
 }
 
-
-
-
-
 /**
  * Creates a new ProgrammingExercise.
  * @class
  */
 
 module.exports = class ProgrammingExercise {
-    static validate = ajv.addSchema(Common_schema).addSchema(YAPEXIL_RESOURCE_schema).addSchema(YAPEXIL_TESTS_schema).addSchema(YAPEXIL_TEST_SET_schema).addSchema(YAPEXIL_SOLUTIONS_schema).addSchema(YAPEXIL_STATEMENTS_schema).compile(YAPEXIL_schema)
+    static validate = ajv.compile(YAPEXIL)
 
     constructor(exercise) {
         if (exercise != undefined) {
-            normalizeData(exercise)
-            Object.assign(this, exercise)
+            if (ProgrammingExercise.isValid(exercise))
+                Object.assign(this, exercise)
+        } else {
+            this.id = '00000000-0000-0000-0000-000000000000'
+            this.title = 'Tamplate Title'
+            this.keywords = []
+            this.type = 'BLANK_SHEET'
+            this.status = 'DRAFT'
+            this.author = 'Anonymous'
+            this.created_at = `${(new Date()).toISOString()}`
+            this.solutions = [{
+                id: '00000000-0000-0000-0000-000000000000',
+                pathname: 'solution.cpp',
+                lang: 'cpp'
+            }]
+            this.tests = [{
+                id: '00000000-0000-0000-0000-000000000000',
+                arguments: [],
+                weight: 5,
+                visible: true,
+                input: 'input1.txt',
+                output: 'output1.txt'
+            }, ]
+            this.statements = [{
+                id: '00000000-0000-0000-0000-000000000000',
+                pathname: 'statements.html',
+                nat_lang: 'en',
+                format: 'HTML'
+            }, ]
+
+
+
+
         }
-
-
     }
+
     setId(id) {
-        if (!isNaN(id) && id > 0) {
+        let aux = {}
+        Object.assign(aux, this)
+        aux.id = id
+        if (ProgrammingExercise.isValid(aux)) {
             this.id = id
             return true
         }
@@ -133,7 +155,10 @@ module.exports = class ProgrammingExercise {
 
     }
     setTitle(title) {
-        if (typeof title === 'string' || title instanceof String) {
+        let aux = {}
+        Object.assign(aux, this)
+        aux.title = title
+        if (ProgrammingExercise.isValid(aux)) {
             this.title = title
             return true
         }
@@ -141,86 +166,76 @@ module.exports = class ProgrammingExercise {
 
     }
     setAuthor(author) {
-        if (typeof author === 'string' || author instanceof String) {
+        let aux = {}
+        Object.assign(aux, this)
+        aux.author = author
+        if (ProgrammingExercise.isValid(aux)) {
             this.author = author
             return true
         }
         return false
     }
     setKeywords(keywords) {
-        if (Array.isArray(keywords)) {
-            for (let str of keywords) {
-                if (str.length > 50)
-                    return false
-            }
+        let aux = {}
+        Object.assign(aux, this)
+        aux.keywords = keywords
+        if (ProgrammingExercise.isValid(aux)) {
             this.keywords = keywords
             return true
         }
         return false
     }
     setStatus(status) {
-        if (typeof status === 'string' || status instanceof String) {
-            status = status.toUpperCase()
-            if (["DRAFT", "PUBLISHED", "UNPUBLISHED", "TRASH"].includes(status)) {
-                this.status = status
-                return true
-            } else return false
-        }
-        return false
+        let aux = {}
+        Object.assign(aux, this)
+        aux.status = status
+        if (ProgrammingExercise.isValid(aux)) {
+            this.status = status
+            return true
+        } else return false
+
+
     }
     setType(type) {
-        if (typeof type === 'string' || type instanceof String) {
-            type = type.toUpperCase()
-            if ([
-                    "BLANK_SHEET",
-                    "EXTENSION",
-                    "IMPROVEMENT",
-                    "BUG_FIX",
-                    "FILL_IN_GAPS",
-                    "SORT_BLOCKS",
-                    "SPOT_BUG"
-                ].includes(type)) {
-                this.type = type
-                return true
-            } else return false
-        }
-        return false
-    }
-    setCreated_at(created_at) {
-        if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(created_at)) {
-            this.created_at = created_at
+        let aux = {}
+        Object.assign(aux, this)
+        aux.type = type
+        if (ProgrammingExercise.isValid(aux)) {
+            this.type = type
             return true
-        }
-        return falses
+        } else return false
+
+
     }
     setTests(tests) {
-        ProgrammingExercise.validate = ajv.compile(YAPEXIL_TESTS_schema)
-        if (ProgrammingExercise.validate(tests)) {
+        let aux = {}
+        Object.assign(aux, this)
+        aux.tests = tests
+        if (ProgrammingExercise.isValid(aux)) {
             this.tests = tests
             return true
         }
-        console.log(JSON.stringify(ProgrammingExercise.validate.errors))
         return false
 
     }
     setSolutions(solutions) {
-        ProgrammingExercise.validate = ajv.compile(YAPEXIL_SOLUTIONS_schema)
-
-        if (ProgrammingExercise.validate(solutions)) {
+        let aux = {}
+        Object.assign(aux, this)
+        aux.solutions = solutions
+        if (ProgrammingExercise.isValid(aux)) {
             this.solutions = solutions
             return true
         }
-        console.log(JSON.stringify(ProgrammingExercise.validate.errors))
         return false
     }
     setStatements(statements) {
-            ProgrammingExercise.validate = ajv.compile(YAPEXIL_STATEMENTS_schema)
-            if (ProgrammingExercise.validate(statements)) {
+            let aux = {}
+            Object.assign(aux, this)
+            aux.statements = statements
+            if (ProgrammingExercise.isValid(aux)) {
                 this.statements = statements
                 return true
             }
-            console.log(JSON.stringify(ProgrammingExercise.validate.errors))
-
             return false
         }
         /** @function getDescription
@@ -273,16 +288,12 @@ module.exports = class ProgrammingExercise {
                 fs.createWriteStream(path.join(tempDir, "response.zip"))
             );
             let data = await ProgrammingExercise.deserialize(tempDir);
-            normalizeData(data)
             Object.assign(this, data)
         } catch (error) {
             console.log(error)
         }
 
     }
-
-
-
     async load_remote_exercise(URI) {
         try {
             const tempDir = os.tmpdir();
@@ -307,7 +318,6 @@ module.exports = class ProgrammingExercise {
      * This function makes an evaluation from an object using the schema loaded by the function setup_validate()
      *   */
     static isValid(obj) {
-        ProgrammingExercise.validate = ajv.compile(YAPEXIL_schema)
         const valid = ProgrammingExercise.validate(obj)
         if (!valid) console.log(JSON.stringify(ProgrammingExercise.validate.errors))
         return valid
@@ -489,6 +499,7 @@ module.exports = class ProgrammingExercise {
                     }
                 }
                 /************************************************************************************************************/
+                normalizeData(n_programming_exercise)
                 let obj = (new ProgrammingExercise(n_programming_exercise))
 
                 return obj
