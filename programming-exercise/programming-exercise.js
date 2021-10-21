@@ -30,7 +30,7 @@ addFormats(ajv, ["date", "time", "date-time"]);
 path.resolve(__dirname, 'settings.json');
 
 /****************************************************************/
-const YAPEXIL = JSON.parse(fs.readFileSync('../../APIs/schemas/YAPEXIL/YAPEXIL.json', { encoding: 'utf8', flag: 'r' }))
+const YAPEXIL = JSON.parse(fs.readFileSync(path.join(__dirname, '../../APIs/schemas/YAPEXIL/YAPEXIL.json'), { encoding: 'utf8', flag: 'r' }))
 
 /****************************************************************/
 var JWT_TOKEN;
@@ -275,7 +275,7 @@ module.exports = class ProgrammingExercise {
          *  
          * This function will load an exercise coming from authorkit API in this class 
          *  @param {string} ID  The exercise ID   */
-    async load_remote_exercise_authorkit(ID) {
+    async loadRemoteExerciseAuthorkit(ID) {
         await do_auth()
         try {
             const tempDir = os.tmpdir();
@@ -294,7 +294,7 @@ module.exports = class ProgrammingExercise {
         }
 
     }
-    async load_remote_exercise(URI) {
+    async loadRemoteExercise(URI) {
         try {
             const tempDir = os.tmpdir();
             await pipeline(
@@ -330,7 +330,7 @@ module.exports = class ProgrammingExercise {
      *   @param {string} p The string that represents the path where this function will output the zip file, if none path is passed the default folder is the "serialized" folder under the current directory
      *  
      *   */
-    async serialize(p = serializedPath()) {
+    async serialize(p = this.serializedPath()) {
             const directory = path.join(p, this.id)
             if (fs.existsSync(directory)) {
                 rimraf.sync(directory)
@@ -429,7 +429,7 @@ module.exports = class ProgrammingExercise {
          *   @param {string} p The string that represents the path where this function will read the zip file, if none path is passed the default folder is the "serialized" folder under the current directory
          *  
          *   */
-    static async deserialize(p = serializedPath(), filename = "response.zip") {
+    static async deserialize(p = this.serializedPath(), filename = "response.zip") {
         var n_programming_exercise = {}
             //deleting the .zip from the name
         var file_path = path.join(p, filename)
@@ -517,9 +517,8 @@ module.exports = class ProgrammingExercise {
     toString() {
         return JSON.stringify(this)
     }
-}
+    static serializedPath() {
+        return path.join(__dirname, 'serialized')
 
-function serializedPath() {
-    return path.join(__dirname, 'serialized')
-
+    }
 }

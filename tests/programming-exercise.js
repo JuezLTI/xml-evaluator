@@ -10,7 +10,7 @@ describe('Test for ProgrammingExercise', async function() {
 
     it('Test metadata of an exercise fetched using authokit-api ', async function() {
         let exerciseObj = new ProgrammingExercise()
-        await exerciseObj.load_remote_exercise_authorkit(`e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7`)
+        await exerciseObj.loadRemoteExerciseAuthorkit(`e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7`)
         expect(ProgrammingExercise.isValid(exerciseObj)).to.equal(true);
 
     })
@@ -22,7 +22,7 @@ describe('Test for ProgrammingExercise', async function() {
 
     it('Test serialization ', async function() {
         let exerciseObj = new ProgrammingExercise()
-        await exerciseObj.load_remote_exercise_authorkit(`e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7`)
+        await exerciseObj.loadRemoteExerciseAuthorkit(`e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7`)
         await exerciseObj.serialize(path.join(__dirname, 'resources'))
         exerciseObj = await ProgrammingExercise.deserialize(path.join(__dirname, 'resources'), "e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7.zip")
         expect(ProgrammingExercise.isValid(exerciseObj)).to.equal(true);

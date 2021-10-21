@@ -1,21 +1,15 @@
-const chai = require('chai'),
-    expect = chai.expect,
-    should = chai.should();
-const path = require('path');
+const chai = require('chai');
+const expect = chai.expect
 
 
 const EvaluationReport = require('../evaluation-report/evaluation-report.js')
-const CONST = require('../programming-exercise/CONST');
-var JWT_TOKEN = "";
-
-
 describe('Test for EvaluationReport', async function() {
 
 
     it('Testing setId ', function() {
         let evaluationReport = new EvaluationReport()
 
-        expect(evaluationReport.setId('1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed')).to.equal(true);
+        expect(evaluationReport.setId('00000000-0000-0000-0000-000000000000')).to.equal(true);
 
     })
 
@@ -37,9 +31,9 @@ describe('Test for EvaluationReport', async function() {
         let evaluationReport = new EvaluationReport()
 
         expect(evaluationReport.setRequest({
-            "date": "2021-06-29T09:01:00.123Z",
+            "date": `${(new Date()).toISOString()}`,
             "program": "count(//node())",
-            "learningObject": "http://jueslti.eu/exercise/123"
+            "learningObject": "00000000-0000-0000-0000-000000000000"
 
         })).to.equal(true)
 

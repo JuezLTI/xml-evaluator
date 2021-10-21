@@ -18,7 +18,7 @@ module.exports = class EvaluationReport {
             this.request = {
                 "date": `${(new Date()).toISOString()}`,
                 "program": "count(//node())",
-                "learningObject": "http://jueslti.eu/exercise/123"
+                "learningObject": "00000000-0000-0000-0000-000000000000"
             }
             this.reply = {}
         }
