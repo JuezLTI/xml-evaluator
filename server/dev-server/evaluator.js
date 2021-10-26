@@ -1,8 +1,6 @@
-const xpath = require('xpath')
-const path = require('path');
-
-const dom = require('xmldom').DOMParser
-const EvaluationReport = require(path.join(__dirname, '../evaluation-report/evaluation-report'))
+import xpath from 'xpath'
+import { DOMParser } from 'xmldom'
+import EvaluationReport from '../../evaluation-report/evaluation-report'
 
 function XPATH(programmingExercise, program) {
     let evalRes = new EvaluationReport();
@@ -35,7 +33,7 @@ function XPATH(programmingExercise, program) {
         let correct_anwsers = []
 
         for (let metadata of programmingExercise.tests) {
-            let input = new dom().parseFromString(programmingExercise.tests_contents_in[metadata.id]);
+            let input = new DOMParser().parseFromString(programmingExercise.tests_contents_in[metadata.id]);
             let teacherNode = null,
                 studentNode = null;
             var teacherResult = xpath.evaluate(
@@ -64,7 +62,7 @@ function XPATH(programmingExercise, program) {
                     if ('request' in evalRes)
                         delete evalRes.request
                     response.report.compilationErrors = "incorrect xpath expression"
-                    console.log(evalRes.setReply(report))
+                    console.log(" evalRes.setReply " + evalRes.setReply(report))
                     return evalRes
                 }
 
@@ -73,7 +71,7 @@ function XPATH(programmingExercise, program) {
                 studentNode = studentResult.iterateNext();
 
             }
-            console.log(evalRes.setReply(response))
+            console.log("evalRes.setReply " + evalRes.setReply(response))
             return evalRes
 
         }
@@ -82,7 +80,7 @@ function XPATH(programmingExercise, program) {
     } catch (error) {
         console.log(error)
         response.report.compilationErrors = JSON.stringify(error)
-        console.log(evalRes.setReply(response))
+        console.log("evalRes.setReply " + evalRes.setReply(response))
         return evalRes
     }
 

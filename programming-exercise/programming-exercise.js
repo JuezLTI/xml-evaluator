@@ -332,95 +332,102 @@ module.exports = class ProgrammingExercise {
      *   */
     async serialize(p = this.serializedPath()) {
             const directory = path.join(p, this.id)
-            if (fs.existsSync(directory)) {
-                rimraf.sync(directory)
 
-            }
-            fs.mkdirSync(directory);
-            let aux = {}
-            Object.assign(aux, this)
-            delete aux.tests_contents_in;
-            delete aux.tests_contents_out;
-            delete aux.statements_contents;
-            delete aux.solutions_contents;
-            delete aux.solutions;
-            delete aux.statements;
-            delete aux.tests;
-
-            fs.writeFileSync(path.join(directory, "metadata.json"), JSON.stringify(aux, null, '\t'), {
-                encoding: "utf8",
-            });
-
-            /*************************************************************************************************************************/
-            // Creating directories [solution,tests,statements]
-            // Under each one of these directories will have the metadata information as well the concreted content 
-            const directory_solutions = path.join(directory, "solutions")
-            if (!fs.existsSync(directory_solutions)) {
-                fs.mkdirSync(directory_solutions);
-
-                for (let metadata_solutions of this.solutions) {
-                    let directory_solutions_id = path.join(directory_solutions, metadata_solutions.id)
-                    fs.mkdirSync(directory_solutions_id);
-                    fs.writeFileSync(path.join(directory_solutions_id, "metadata.json"), JSON.stringify(metadata_solutions, null, '\t'), {
-                        encoding: "utf8",
-                        flag: 'wx'
-                    });
-                    fs.writeFileSync(path.join(directory_solutions_id, metadata_solutions.pathname), this.solutions_contents[metadata_solutions.id], {
-                        encoding: "utf8",
-                    });
+            try {
+                if (fs.existsSync(directory)) {
+                    rimraf.sync(directory)
                 }
-            }
-            const directory_tests = path.join(directory, "tests")
-            if (!fs.existsSync(directory_tests)) {
-                fs.mkdirSync(directory_tests);
+                fs.mkdirSync(directory);
+                let aux = {}
+                Object.assign(aux, this)
+                delete aux.tests_contents_in;
+                delete aux.tests_contents_out;
+                delete aux.statements_contents;
+                delete aux.solutions_contents;
+                delete aux.solutions;
+                delete aux.statements;
+                delete aux.tests;
 
-                for (let metadata_tests of this.tests) {
-                    let directory_tests_id = path.join(directory_tests, metadata_tests.id)
-                    fs.mkdirSync(directory_tests_id);
+                fs.writeFileSync(path.join(directory, "metadata.json"), JSON.stringify(aux, null, '\t'), {
+                    encoding: "utf8",
+                });
 
-                    fs.writeFileSync(path.join(directory_tests_id, "metadata.json"), JSON.stringify(metadata_tests, null, '\t'), {
-                        encoding: "utf8",
-                        flag: 'wx'
-                    });
-                    fs.writeFileSync(path.join(directory_tests_id, metadata_tests.input), this.tests_contents_in[metadata_tests.id], {
-                        encoding: "utf8",
-                        flag: 'wx'
-                    });
-                    fs.writeFileSync(path.join(directory_tests_id, metadata_tests.output), this.tests_contents_out[metadata_tests.id], {
-                        encoding: "utf8",
-                        flag: 'wx'
-                    });
-                }
-            }
-            const directory_statements = path.join(directory, "statements")
-            if (!fs.existsSync(directory_statements)) {
-                fs.mkdirSync(directory_statements);
+                /*************************************************************************************************************************/
+                // Creating directories [solution,tests,statements]
+                // Under each one of these directories will have the metadata information as well the concreted content 
+                const directory_solutions = path.join(directory, "solutions")
+                if (!fs.existsSync(directory_solutions)) {
+                    fs.mkdirSync(directory_solutions);
 
-                for (let metadata_statements of this.statements) {
-                    let directory_statements_id = path.join(directory_statements, metadata_statements.id)
-                    fs.mkdirSync(directory_statements_id);
-
-                    fs.writeFileSync(path.join(directory_statements_id, "metadata.json"), JSON.stringify(metadata_statements, null, '\t'), {
-                        encoding: "utf8",
-                        flag: 'wx'
-                    });
-                    if (metadata_statements.format != "pdf")
-                        fs.writeFileSync(path.join(directory_statements_id, metadata_statements.pathname), this.statements_contents[metadata_statements.id], {
+                    for (let metadata_solutions of this.solutions) {
+                        let directory_solutions_id = path.join(directory_solutions, metadata_solutions.id)
+                        fs.mkdirSync(directory_solutions_id);
+                        fs.writeFileSync(path.join(directory_solutions_id, "metadata.json"), JSON.stringify(metadata_solutions, null, '\t'), {
                             encoding: "utf8",
                             flag: 'wx'
                         });
-                    else
-                        base64topdf.base64Decode(this.statements_contents[metadata_statements.id], path.join(directory_statements_id, metadata_statements.pathname));
-
+                        fs.writeFileSync(path.join(directory_solutions_id, metadata_solutions.pathname), this.solutions_contents[metadata_solutions.id], {
+                            encoding: "utf8",
+                        });
+                    }
                 }
+                const directory_tests = path.join(directory, "tests")
+                if (!fs.existsSync(directory_tests)) {
+                    fs.mkdirSync(directory_tests);
+
+                    for (let metadata_tests of this.tests) {
+                        let directory_tests_id = path.join(directory_tests, metadata_tests.id)
+                        fs.mkdirSync(directory_tests_id);
+
+                        fs.writeFileSync(path.join(directory_tests_id, "metadata.json"), JSON.stringify(metadata_tests, null, '\t'), {
+                            encoding: "utf8",
+                            flag: 'wx'
+                        });
+                        fs.writeFileSync(path.join(directory_tests_id, metadata_tests.input), this.tests_contents_in[metadata_tests.id], {
+                            encoding: "utf8",
+                            flag: 'wx'
+                        });
+                        fs.writeFileSync(path.join(directory_tests_id, metadata_tests.output), this.tests_contents_out[metadata_tests.id], {
+                            encoding: "utf8",
+                            flag: 'wx'
+                        });
+                    }
+                }
+                const directory_statements = path.join(directory, "statements")
+                if (!fs.existsSync(directory_statements)) {
+                    fs.mkdirSync(directory_statements);
+
+                    for (let metadata_statements of this.statements) {
+                        let directory_statements_id = path.join(directory_statements, metadata_statements.id)
+                        fs.mkdirSync(directory_statements_id);
+
+                        fs.writeFileSync(path.join(directory_statements_id, "metadata.json"), JSON.stringify(metadata_statements, null, '\t'), {
+                            encoding: "utf8",
+                            flag: 'wx'
+                        });
+                        if (metadata_statements.format != "pdf")
+                            fs.writeFileSync(path.join(directory_statements_id, metadata_statements.pathname), this.statements_contents[metadata_statements.id], {
+                                encoding: "utf8",
+                                flag: 'wx'
+                            });
+                        else
+                            base64topdf.base64Decode(this.statements_contents[metadata_statements.id], path.join(directory_statements_id, metadata_statements.pathname));
+
+                    }
+                }
+                /*************************************************************************************************************************/
+                // make a zip if these folders 
+                let file_zip_name = path.join(p, this.id)
+                await zip_a_folder.zip(directory, `${file_zip_name}.zip`);
+                // deleting the folder created for auxiliary at the  zip process 
+                // I tried with fs.rmdirSync but did not work 
+                return true
+            } catch (e) {
+                console.log(e)
+                return false
             }
-            /*************************************************************************************************************************/
-            // make a zip if these folders 
-            let file_zip_name = path.join(p, this.id)
-            await zip_a_folder.zip(directory, `${file_zip_name}.zip`);
-            // deleting the folder created for auxiliary at the  zip process 
-            // I tried with fs.rmdirSync but did not work 
             rimraf.sync(directory)
+
 
         }
         /** @function  deserialize

@@ -1,18 +1,21 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+import express from 'express';
+import path from 'path';
+import cookieParser from 'cookie-parser';
+import logger from 'morgan';
+import { router as indexRouter, data } from './routes/index';
+import createError from 'http-errors';
 
-var indexRouter = require('./routes/index');
+
+
+
 var app = express();
-
+app.cacheExercise = data
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/', indexRouter);
 
@@ -32,4 +35,4 @@ app.use(function(err, req, res, next) {
     res.json({ error: err })
 });
 
-module.exports = app;
+export default app;
