@@ -12,12 +12,6 @@ Here is defined two classes util now, these classes are EvaluationReport and Pro
 
 ## Installation
 
-To run a small example of how to use the ProgrammingExercise class do. 
-```sh
-cd programming-exercise
-npm run setup
-node tester.js
-```
 To run the unit tests that will cover programming-exercise.js and authorkit-api.js do.
 ```sh
 cd tests
