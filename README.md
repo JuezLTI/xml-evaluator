@@ -12,7 +12,7 @@ Here is defined two classes util now, these classes are EvaluationReport and Pro
 
 ## Installation
 
-To run the unit tests that will cover programming-exercise.js and authorkit-api.js do.
+To run the unit tests that will cover programming-exercise.js and evaluation-report.js do.
 ```sh
 cd tests
 npm install
