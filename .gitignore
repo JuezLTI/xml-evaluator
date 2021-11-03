@@ -6,5 +6,5 @@ server/public/*
 server/dist-server
 tests/node_modules/
 tests/resources/*
-main/
+main/node_modules/
 
