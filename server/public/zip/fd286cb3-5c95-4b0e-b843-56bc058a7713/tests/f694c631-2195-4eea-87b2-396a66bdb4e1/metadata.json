@@ -5,5 +5,8 @@
 	"visible": true,
 	"input": "input.xml",
 	"output": "output.xml",
-	"timeout": 0
+	"timeout": 0,
+	"feedback": {
+		"message": "no feedback"
+	}
 }

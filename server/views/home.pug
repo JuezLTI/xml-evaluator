@@ -3,7 +3,19 @@ html
     title= title
   body
     h1.main-title= message
-    .table
-      each nme in list
-        .row
-          .col=nme
+    .main-text= text 
+      a(href='//fgpe.dcc.fc.up.pt/projects/323c111a-7fed-4096-b047-64154ab2132b/exercises') here
+      pre.code= curl_exm 
+
+    style(type="text/css").
+      .main-title,.main-text {
+        text-align: center;
+      } 
+      .main-title{
+        margin-top:100px;
+      }
+      .code{
+        width: 50%;
+        inline-size: 150px;
+        overflow-wrap: break-word;
+      }

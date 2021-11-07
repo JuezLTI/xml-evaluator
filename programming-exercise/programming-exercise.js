@@ -87,8 +87,23 @@ function normalizeData(data) {
     else {
         data.type = data.type.toUpperCase()
     }
+    data.tests.map((t) => {
+        if ("visible" in t) {
+            if (t.visible == "true")
+                t.visible = true
+            else
+                t.visible = false
+        }
+        if ("timeout" in t) {
+            t.timeout = parseInt(t.timeout)
 
-
+        }
+        if ("feedback" in t) {
+            if (!("message" in t.feedback)) {
+                t.feedback.message = "no feedback"
+            }
+        }
+    })
 
 
 
@@ -289,6 +304,7 @@ module.exports = class ProgrammingExercise {
             );
             let data = await ProgrammingExercise.deserialize(tempDir);
             Object.assign(this, data)
+            return this
         } catch (error) {
             console.log(error)
         }
@@ -512,8 +528,9 @@ module.exports = class ProgrammingExercise {
                 return obj
             } catch (err) {
                 console.log(err)
+                return {}
             }
-            return {}
+
 
         }
 

@@ -10,7 +10,7 @@ var data = []
 
 var router = express.Router();
 
-router.get('/capabilities', function (req, res, next) {
+router.get('/capabilities', function(req, res, next) {
     let evalRes = new EvaluationReport()
     let obj = {
         "capabilities": [{
@@ -36,18 +36,12 @@ router.get('/capabilities', function (req, res, next) {
 
 
 
-router.get('/', function (req, res) {
-    let list = []
-
-    fs.readdirSync(path.join(__dirname, "../../public/zip")).forEach(file => {
-        if (file.toString().includes(".zip")) {
-            list.push(file.toString())
-        }
-    });
+router.get('/', function(req, res) {
+    let text = fs.readFileSync(path.join(__dirname, "../../public/doc/intro.txt"), { encoding: 'utf8', flag: 'r' });
+    let curl_exm = fs.readFileSync(path.join(__dirname, "../../public/doc/curl"), { encoding: 'utf8', flag: 'r' });
 
     try {
-        console.log("LISTA ", list)
-        res.render('home', { title: 'JuezLTIs', message: 'Exercises available for testing', list: list })
+        res.render('home', { title: 'JuezLTIs', message: 'Mini server to test XPATH exercise', 'text': text, 'curl_exm': curl_exm })
 
     } catch (e) {
         console.log(e)
@@ -58,25 +52,36 @@ router.get('/', function (req, res) {
 
 
 
-router.post('/eval', function (req, res, next) {
+router.post('/eval', function(req, res, next) {
     let evalReq = new EvaluationReport()
     if (evalReq.setRequest(req.body)) {
         if ('program' in evalReq.request) {
             try {
-                ProgrammingExercise.deserialize(ProgrammingExercise.serializedPath(), `${evalReq.request.learningObject}.zip`).then(programmingExercise => {
-                    let obj = evaluator.XPATH(programmingExercise, evalReq.request.program)
-                    if (!data.includes(programmingExercise.id)) {
-                        data.push(programmingExercise.id)
-                        programmingExercise.serialize(path.join(__dirname, "../../public/zip")).then(test => {
-                            if (test) {
-                                console.log(`The exercise ${programmingExercise.id} was insert in cache`)
-                            }
-                        })
+                let exerciseObj = new ProgrammingExercise()
+
+
+                exerciseObj.loadRemoteExerciseAuthorkit(evalReq.request.learningObject).then(programmingExercise => {
+                    try {
+                        let obj = evaluator.XPATH(programmingExercise, evalReq.request.program)
+                        if (!data.includes(programmingExercise.id)) {
+                            data.push(programmingExercise.id)
+                            programmingExercise.serialize(path.join(__dirname, "../../public/zip")).then(test => {
+                                if (test) {
+                                    console.log(`The exercise ${programmingExercise.id} was insert in cache`)
+                                }
+                            })
+                        }
+                        res.json(obj)
+                    } catch (e) {
+                        console.log(e)
+
+                        res.send(e)
                     }
-                    res.json(obj)
                 })
             } catch (error) {
                 console.log(error)
+                res.send(error)
+
             }
         }
     }
