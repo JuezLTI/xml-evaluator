@@ -4,12 +4,13 @@ import EvaluationReport from '../../../evaluation-report/evaluation-report'
 import ProgrammingExercise from '../../../programming-exercise/programming-exercise'
 import evaluator from '../evaluator'
 import path from 'path'
+import fs from 'fs';
 
 var data = []
 
 var router = express.Router();
 
-router.get('/capabilities', function(req, res, next) {
+router.get('/capabilities', function (req, res, next) {
     let evalRes = new EvaluationReport()
     let obj = {
         "capabilities": [{
@@ -35,10 +36,29 @@ router.get('/capabilities', function(req, res, next) {
 
 
 
-router.get('/', function(req, res, next) {
-    res.send(getAvailableExercise())
-});
-router.post('/eval', function(req, res, next) {
+router.get('/', function (req, res) {
+    let list = []
+
+    fs.readdirSync(path.join(__dirname, "../../public/zip")).forEach(file => {
+        if (file.toString().includes(".zip")) {
+            list.push(file.toString())
+        }
+    });
+
+    try {
+        console.log("LISTA ", list)
+        res.render('home', { title: 'JuezLTIs', message: 'Exercises available for testing', list: list })
+
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+
+
+
+
+router.post('/eval', function (req, res, next) {
     let evalReq = new EvaluationReport()
     if (evalReq.setRequest(req.body)) {
         if ('program' in evalReq.request) {
