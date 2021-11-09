@@ -17,7 +17,7 @@ const request = require('request');
 
     request({
         'method': 'POST',
-        'url': 'http://localhost:3000/eval',
+        'url': 'http://juezlti.dcc.fc.up.pt/eval',
         'headers': {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
