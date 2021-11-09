@@ -11,7 +11,7 @@ const request = require('request');
     console.log(eval.setRequest({
         "date": (new Date()).toISOString(),
         "program": "/bookstore/book/price",
-        "learningObject": "fd286cb3-5c95-4b0e-b843-56bc058a7713"
+        "learningObject": "507d41d6-354f-40a0-934d-16e3e2e4da96"
     }))
 
     console.log("\n" + JSON.stringify(eval.request) + "\n")
