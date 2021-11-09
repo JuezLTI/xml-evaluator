@@ -302,7 +302,11 @@ module.exports = class ProgrammingExercise {
                 }),
                 fs.createWriteStream(path.join(tempDir, "response.zip"))
             );
+            if (fs.existsSync(path.join(tempDir, "response"))) {
+                rimraf.sync(path.join(tempDir, "response"))
+            }
             let data = await ProgrammingExercise.deserialize(tempDir);
+
             Object.assign(this, data)
             return this
         } catch (error) {

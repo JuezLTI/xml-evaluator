@@ -2,8 +2,10 @@ import xpath from 'xpath'
 import { DOMParser } from 'xmldom'
 import EvaluationReport from '../../evaluation-report/evaluation-report'
 
-function XPATH(programmingExercise, program) {
+function XPATH(programmingExercise, evalReq) {
     let evalRes = new EvaluationReport();
+    evalRes.setRequest(evalReq.request)
+    let program = evalReq.request.program
     let response = {}
     response.report = {}
     response.report.capability = {
@@ -31,7 +33,6 @@ function XPATH(programmingExercise, program) {
         }
         const solution = programmingExercise.solutions_contents[solution_id]
         let correct_anwsers = []
-
         for (let metadata of programmingExercise.tests) {
             let input = new DOMParser().parseFromString(programmingExercise.tests_contents_in[metadata.id]);
             let teacherNode = null,
@@ -54,23 +55,24 @@ function XPATH(programmingExercise, program) {
 
             teacherNode = teacherResult.iterateNext();
             studentNode = studentResult.iterateNext();
+            console.log("teacher node " + teacherNode)
+            if (teacherNode == undefined) {
+                response.report.compilationErrors = "incorrect exercise format"
+                console.log("evalRes.setReply " + evalRes.setReply(response))
+            } else {
+                while (teacherNode) {
+                    if (teacherNode != studentNode) {
 
-            while (teacherNode) {
-                //console.log(node.localName + ": " + node.firstChild.data);
-                //console.log("Node: " + node.toString());
-                if (teacherNode != studentNode) {
-
-                    response.report.compilationErrors = "incorrect xpath expression"
-                    console.log(" evalRes.setReply " + evalRes.setReply(report))
-                    return evalRes
+                        response.report.compilationErrors = "incorrect xpath expression"
+                        console.log(" evalRes.setReply " + evalRes.setReply(response))
+                        return evalRes
+                    }
+                    teacherNode = teacherResult.iterateNext();
+                    studentNode = studentResult.iterateNext();
                 }
-
-
-                teacherNode = teacherResult.iterateNext();
-                studentNode = studentResult.iterateNext();
-
+                console.log("evalRes.setReply " + evalRes.setReply(response))
             }
-            console.log("evalRes.setReply " + evalRes.setReply(response))
+
             return evalRes
 
         }

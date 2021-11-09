@@ -10,8 +10,8 @@ const request = require('request');
 
     console.log(eval.setRequest({
         "date": (new Date()).toISOString(),
-        "program": "/bookstore/book/price",
-        "learningObject": "507d41d6-354f-40a0-934d-16e3e2e4da96"
+        "program": "/bookstore/book/price//text()",
+        "learningObject": "f9d4ce5b-b6b0-47cc-8e05-8d93fc492f00"
     }))
 
     console.log("\n" + JSON.stringify(eval.request) + "\n")
