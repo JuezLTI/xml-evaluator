@@ -55,6 +55,7 @@ router.get('/', function(req, res) {
 router.post('/eval', function(req, res, next) {
     let evalReq = new EvaluationReport()
     if (evalReq.setRequest(req.body)) {
+        console.log(evalReq)
         if ('program' in evalReq.request) {
             try {
                 let exerciseObj = new ProgrammingExercise()
@@ -62,7 +63,7 @@ router.post('/eval', function(req, res, next) {
 
                 exerciseObj.loadRemoteExerciseAuthorkit(evalReq.request.learningObject).then(programmingExercise => {
                     try {
-                        let obj = evaluator.XPATH(programmingExercise, evalReq.request.program)
+                        let obj = evaluator.XPATH(programmingExercise, evalReq)
                         if (!data.includes(programmingExercise.id)) {
                             data.push(programmingExercise.id)
                             programmingExercise.serialize(path.join(__dirname, "../../public/zip")).then(test => {

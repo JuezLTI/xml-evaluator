@@ -2,8 +2,10 @@ import xpath from 'xpath'
 import { DOMParser } from 'xmldom'
 import EvaluationReport from '../../evaluation-report/evaluation-report'
 
-function XPATH(programmingExercise, program) {
+function XPATH(programmingExercise, evalReq) {
     let evalRes = new EvaluationReport();
+    evalRes.setRequest(evalReq.request)
+    let program = evalReq.request.program
     let response = {}
     response.report = {}
     response.report.capability = {
@@ -59,10 +61,10 @@ function XPATH(programmingExercise, program) {
                 //console.log(node.localName + ": " + node.firstChild.data);
                 //console.log("Node: " + node.toString());
                 if (teacherNode != studentNode) {
-                    if ('request' in evalRes)
-                        delete evalRes.request
+
                     response.report.compilationErrors = "incorrect xpath expression"
-                    console.log(" evalRes.setReply " + evalRes.setReply(report))
+
+                    console.log(" evalRes.setReply ? " + evalRes.setReply(response))
                     return evalRes
                 }
 

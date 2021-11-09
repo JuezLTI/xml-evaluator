@@ -60,6 +60,7 @@ module.exports = class EvaluationReport {
         let aux = {}
         Object.assign(aux, this)
         aux.reply = reply
+       
         if (EvaluationReport.isValidate(aux)) {
             this.reply = reply
             return true
