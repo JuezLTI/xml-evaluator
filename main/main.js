@@ -14,7 +14,7 @@ const request = require('request');
         "learningObject": "fd286cb3-5c95-4b0e-b843-56bc058a7713"
     }))
 
-
+    console.log("\n" + JSON.stringify(eval.request) + "\n")
     request({
         'method': 'POST',
         'url': 'http://juezlti.dcc.fc.up.pt/eval',
@@ -30,16 +30,16 @@ const request = require('request');
     });
 
 
-    /*
-        request({
-            'method': 'GET',
-            'url': 'http://localhost:3000/capabilities',
-            'headers': {
-                'Accept': 'application/json',
-            },
-        }, function(error, response) {
-            if (error) throw new Error(error);
-            console.log(response.body);
-        });
-    */
+
+    request({
+        'method': 'GET',
+        'url': 'http://localhost:3000/capabilities',
+        'headers': {
+            'Accept': 'application/json',
+        },
+    }, function(error, response) {
+        if (error) throw new Error(error);
+        console.log(response.body);
+    });
+
 })();

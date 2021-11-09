@@ -41,7 +41,7 @@ router.get('/', function(req, res) {
     let curl_exm = fs.readFileSync(path.join(__dirname, "../../public/doc/curl"), { encoding: 'utf8', flag: 'r' });
 
     try {
-        res.render('home', { title: 'JuezLTIs', message: 'Mini server to test XPATH exercise', 'text': text, 'curl_exm': curl_exm })
+        res.render('index')
 
     } catch (e) {
         console.log(e)
