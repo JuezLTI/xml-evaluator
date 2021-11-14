@@ -106,8 +106,8 @@ router.post("/eval", function(req, res, next) {
             body: req.xpath_eval_result,
         },
         function(error, response) {
-            if (error) throw new Error(error);
-            res.json(response.body);
+            if (error) res.json(req.xpath_eval_result);
+            else res.json(response.body);
         }
     );
 });
