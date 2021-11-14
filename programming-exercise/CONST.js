@@ -6,4 +6,6 @@ module.exports = {
     EMAIL: 'info@juezlti.eu',
     PASSWORD: 'Ju3zLT1.',
     YAPEXIL_SCHEMA: 'https://raw.githubusercontent.com/FGPE-Erasmus/format-specifications/master/schemas/yapexil.schema.json',
+    FEEDBACK_MANAGER_URL: 'http://localhost:3003',
+
 }

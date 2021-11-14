@@ -1,6 +1,6 @@
 {
     "name": "evaluation-report",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "",
     "main": "evaluation-report.js",
     "scripts": {

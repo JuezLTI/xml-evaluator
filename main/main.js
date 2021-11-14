@@ -11,13 +11,13 @@ const request = require('request');
     console.log(eval.setRequest({
         "date": (new Date()).toISOString(),
         "program": "/bookstore/book/price//text()",
-        "learningObject": "f9d4ce5b-b6b0-47cc-8e05-8d93fc492f00"
+        "learningObject": "fd286cb3-5c95-4b0e-b843-56bc058a7713"
     }))
 
     console.log("\n" + JSON.stringify(eval.request) + "\n")
     request({
         'method': 'POST',
-        'url': 'http://localhost:3000/eval',
+        'url': 'http://juezlti.dcc.fc.up.pt/eval',
         'headers': {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
