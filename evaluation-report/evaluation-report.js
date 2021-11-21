@@ -16,7 +16,7 @@ const PEARL = JSON.parse(
 module.exports = class EvaluationReport {
     static validate = ajv.compile(PEARL);
     constructor(message) {
-        if (message != undefined && EvaluationReport.isValidate(message)) {
+        if (message != undefined && EvaluationReport.Validate(message)) {
             this.request = message.request;
             this.reply = message.reply;
         } else {
@@ -32,7 +32,7 @@ module.exports = class EvaluationReport {
         let aux = {};
         Object.assign(aux, this);
         aux.id = id;
-        if (EvaluationReport.isValidate(aux)) {
+        if (EvaluationReport.Validate(aux)) {
             this.id = id;
             return true;
         }
@@ -42,7 +42,7 @@ module.exports = class EvaluationReport {
         let aux = {};
         Object.assign(aux, this);
         aux.date = date;
-        if (EvaluationReport.isValidate(aux)) {
+        if (EvaluationReport.Validate(aux)) {
             this.date = date;
             return true;
         }
@@ -52,7 +52,7 @@ module.exports = class EvaluationReport {
         let aux = {};
         Object.assign(aux, this);
         aux.request = request;
-        if (EvaluationReport.isValidate(aux)) {
+        if (EvaluationReport.Validate(aux)) {
             this.request = request;
             return true;
         }
@@ -63,13 +63,13 @@ module.exports = class EvaluationReport {
         Object.assign(aux, this);
         aux.reply = reply;
 
-        if (EvaluationReport.isValidate(aux)) {
+        if (EvaluationReport.Validate(aux)) {
             this.reply = reply;
             return true;
         }
         return false;
     }
-    static isValidate(obj) {
+    static Validate(obj) {
         const valid = EvaluationReport.validate(obj);
         if (!valid) console.log(JSON.stringify(EvaluationReport.validate.errors));
         return valid;
