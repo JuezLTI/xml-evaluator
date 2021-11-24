@@ -6,4 +6,4 @@ server/public/zip/*
 server/dist-server
 tests/node_modules/
 main/node_modules/
-
+main/temp/

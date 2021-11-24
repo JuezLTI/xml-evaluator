@@ -403,6 +403,7 @@ module.exports = class ProgrammingExercise {
                             encoding: "utf8",
                             flag: 'wx'
                         });
+
                         fs.writeFileSync(path.join(directory_tests_id, metadata_tests.input), this.tests_contents_in[metadata_tests.id], {
                             encoding: "utf8",
                             flag: 'wx'
@@ -425,7 +426,8 @@ module.exports = class ProgrammingExercise {
                             encoding: "utf8",
                             flag: 'wx'
                         });
-                        if (metadata_statements.format != "pdf")
+
+                        if (metadata_statements.format.toUpperCase() != "PDF")
                             fs.writeFileSync(path.join(directory_statements_id, metadata_statements.pathname), this.statements_contents[metadata_statements.id], {
                                 encoding: "utf8",
                                 flag: 'wx'
