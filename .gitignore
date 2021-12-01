@@ -1,6 +1,6 @@
-programming-exercise/node_modules/
-programming-exercise/serialized/*
-evaluation-report/node_modules/
+programming-exercise-juezlti/node_modules/
+programming-exercise-juezlti/serialized/*
+evaluation-report-juezlti/node_modules/
 server/node_modules/
 server/public/zip/*
 server/dist-server
