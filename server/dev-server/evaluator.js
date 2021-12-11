@@ -40,6 +40,8 @@ function XPATH(programmingExercise, evalReq) {
                     let input = new DOMParser().parseFromString(programmingExercise.tests_contents_in[metadata.id]);
                     let teacherNode = null,
                         studentNode = null;
+
+
                     var teacherResult = xpath.evaluate(
                         solution, // xpathExpression
                         input, // contextNode
@@ -48,33 +50,55 @@ function XPATH(programmingExercise, evalReq) {
                         null // result
                     )
                     var studentResult = xpath.evaluate(
-                        program, // xpathExpression
-                        input, // contextNode
-                        null, // namespaceResolver
-                        xpath.XPathResult.ANY_TYPE, // resultType
-                        null // result
-                    )
+                            program, // xpathExpression
+                            input, // contextNode
+                            null, // namespaceResolver
+                            xpath.XPathResult.ANY_TYPE, // resultType
+                            null // result
+                        )
+                        /*
+                                            console.log(solution)
+                                            console.log(program)
 
+                                            console.log(teacherResult)
 
-                    teacherNode = teacherResult.iterateNext();
-                    studentNode = studentResult.iterateNext();
-                    console.log("teacher node " + teacherNode)
-                    if (teacherNode == undefined) {
-                        response.report.compilationErrors = "incorrect exercise format"
-                        console.log("evalRes.setReply " + evalRes.setReply(response))
-                    } else {
-                        while (teacherNode) {
-                            if (teacherNode != studentNode) {
-
+                                            console.log(studentResult)
+                        */
+                    if (teacherResult.resultType == 1 || teacherResult.resultType == 2) {
+                        if ("numberValue" in teacherResult)
+                            if (teacherResult.numberValue != studentResult.numberValue) {
                                 response.report.compilationErrors = "incorrect xpath expression"
-                                console.log(" evalRes.setReply " + evalRes.setReply(response))
-                                return evalRes
+                                resolve(evalRes)
                             }
-                            teacherNode = teacherResult.iterateNext();
-                            studentNode = studentResult.iterateNext();
+                        if ("stringValue:" in teacherResult)
+                            if (teacherResult.stringValue != studentResult.stringValue) {
+                                response.report.compilationErrors = "incorrect xpath expression"
+                                resolve(evalRes)
+                            }
+
+                    } else if (teacherResult.resultType == 4 || teacherResult.resultType == 5) {
+                        teacherNode = teacherResult.iterateNext();
+                        studentNode = studentResult.iterateNext();
+                        console.log("teacher node " + teacherNode)
+                        if (teacherNode == undefined) {
+                            response.report.compilationErrors = "incorrect exercise format"
+                            console.log("evalRes.setReply " + evalRes.setReply(response))
+                        } else {
+                            while (teacherNode) {
+                                if (teacherNode != studentNode) {
+
+                                    response.report.compilationErrors = "incorrect xpath expression"
+                                    console.log(" evalRes.setReply " + evalRes.setReply(response))
+                                    resolve(evalRes)
+                                }
+                                teacherNode = teacherResult.iterateNext();
+                                studentNode = studentResult.iterateNext();
+                            }
+                            console.log("evalRes.setReply " + evalRes.setReply(response))
                         }
-                        console.log("evalRes.setReply " + evalRes.setReply(response))
                     }
+
+
 
                     resolve(evalRes)
                 }

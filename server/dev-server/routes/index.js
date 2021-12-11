@@ -57,6 +57,8 @@ router.get("/", function(req, res) {
 router.post("/eval", function(req, res, next) {
 
     loadSchemaPEARL().then(() => {
+        console.log(req.body)
+
         let evalReq = new EvaluationReport();
         if (evalReq.setRequest(req.body)) {
             if ("program" in evalReq.request) {
@@ -66,8 +68,11 @@ router.post("/eval", function(req, res, next) {
                         ProgrammingExercise.deserialize(path.join(__dirname, "../../public/zip"), `${evalReq.request.learningObject}.zip`).
                         then((programmingExercise) => {
                             evaluator.XPATH(programmingExercise, evalReq).then((obj) => {
+                                console.log(obj)
                                 req.xpath_eval_result = JSON.stringify(obj);
-                                next();
+
+                                res.send(obj).status(200);
+                                //next();
                             });
                         }).catch((error) => {
                             console.log("error " + error);
@@ -114,6 +119,8 @@ router.post("/eval", function(req, res, next) {
                     res.send({ error: error });
                 }
             }
+        } else {
+            res.send({ "error": "INVALID PEARL" }).status(500);
         }
 
     })
