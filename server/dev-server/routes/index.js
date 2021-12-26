@@ -67,25 +67,18 @@ router.post("/eval", function(req, res, next) {
                     if (data.includes(evalReq.request.learningObject)) {
                         ProgrammingExercise.deserialize(path.join(__dirname, "../../public/zip"), `${evalReq.request.learningObject}.zip`).
                         then((programmingExercise) => {
-                            evaluator.XPATH(programmingExercise, evalReq).then((obj) => {
-                                console.log(obj)
-                                req.xpath_eval_result = JSON.stringify(obj);
-
-                                res.send(obj).status(200);
-                                //next();
-                            });
+                            evaluate(programmingExercise, evalReq, req, res)
                         }).catch((error) => {
                             console.log("error " + error);
                             res.statusCode(500).send("The learning object request is already in cache but was not possible to read")
                         })
-
-
-
                     } else {
                         loadSchemaYAPEXIL().then(() => {
                             ProgrammingExercise
                                 .loadRemoteExerciseAuthorkit(evalReq.request.learningObject, email, password)
                                 .then((programmingExercise) => {
+
+                                    evaluate(programmingExercise, evalReq, req, res)
 
                                     data.push(programmingExercise.id);
                                     programmingExercise
@@ -97,16 +90,12 @@ router.post("/eval", function(req, res, next) {
                                                 );
                                             }
                                         });
-                                    evaluator.XPATH(programmingExercise, evalReq).then((obj) => {
-
-                                        req.xpath_eval_result = JSON.stringify(obj);
-                                        next();
-                                    });
 
 
 
 
                                 }).catch((error) => {
+                                    console.log(error)
                                     console.log(" 1º error LearningObj not found or could not be loaded");
                                     res.send({ error: "LearningObj not found" });
                                 });
@@ -125,6 +114,23 @@ router.post("/eval", function(req, res, next) {
 
     })
 });
+
+function evaluate(programmingExercise, evalReq, req, res) {
+    evaluator.XPATH(programmingExercise, evalReq).then((obj) => {
+        console.log("Resposta ->" + JSON.stringify(obj))
+        req.xpath_eval_result = JSON.stringify(obj);
+        req.number_of_tests = programmingExercise.getTests().length
+        if (obj.reply.report.compilationErrors.length > 0) {
+            res.send("Incorrect Answer").status(200);
+        } else {
+            res.send("Correct Answer").status(200);
+
+        }
+
+
+        // next();
+    });
+}
 const FEEDBACK_MANAGER_URL = 'http://localhost:3003';
 
 router.post("/eval", function(req, res, next) {
@@ -135,7 +141,7 @@ router.post("/eval", function(req, res, next) {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
-            body: req.xpath_eval_result,
+            body: { PEARL: req.xpath_eval_result, additional: { numberOfTests: req.number_of_tests } },
         },
         function(error, response) {
             if (error) res.json(req.xpath_eval_result);

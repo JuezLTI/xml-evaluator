@@ -24,7 +24,9 @@ function XPATH(programmingExercise, evalReq) {
                     "value": "https://www.npmjs.com/package/xpath"
                 }]
             }
+
             response.report.exercise = programmingExercise.id
+            response.report.compilationErrors = [];
             try {
 
                 let solution_id = ""
@@ -35,7 +37,7 @@ function XPATH(programmingExercise, evalReq) {
                     }
                 }
                 const solution = programmingExercise.solutions_contents[solution_id]
-                let correct_anwsers = []
+                let i = 0;
                 for (let metadata of programmingExercise.tests) {
                     let input = new DOMParser().parseFromString(programmingExercise.tests_contents_in[metadata.id]);
                     let teacherNode = null,
@@ -57,23 +59,25 @@ function XPATH(programmingExercise, evalReq) {
                             null // result
                         )
                         /*
-                                            console.log(solution)
-                                            console.log(program)
+        console.log(solution)
+        console.log(program)
 
-                                            console.log(teacherResult)
+        console.log(teacherResult)
 
-                                            console.log(studentResult)
-                        */
+        console.log(studentResult)
+            */
                     if (teacherResult.resultType == 1 || teacherResult.resultType == 2) {
                         if ("numberValue" in teacherResult)
                             if (teacherResult.numberValue != studentResult.numberValue) {
-                                response.report.compilationErrors = "incorrect xpath expression"
-                                resolve(evalRes)
+
+                                response.report.compilationErrors.push(`{${i}:incorrect xpath expression}`)
+
                             }
                         if ("stringValue:" in teacherResult)
                             if (teacherResult.stringValue != studentResult.stringValue) {
-                                response.report.compilationErrors = "incorrect xpath expression"
-                                resolve(evalRes)
+                                response.report.compilationErrors.push(`{${i}:incorrect xpath expression}`)
+
+
                             }
 
                     } else if (teacherResult.resultType == 4 || teacherResult.resultType == 5) {
@@ -81,32 +85,32 @@ function XPATH(programmingExercise, evalReq) {
                         studentNode = studentResult.iterateNext();
                         console.log("teacher node " + teacherNode)
                         if (teacherNode == undefined) {
-                            response.report.compilationErrors = "incorrect exercise format"
-                            console.log("evalRes.setReply " + evalRes.setReply(response))
+                            response.report.compilationErrors.push(`{${i}:incorrect xpath expression}`)
+
                         } else {
                             while (teacherNode) {
                                 if (teacherNode != studentNode) {
 
-                                    response.report.compilationErrors = "incorrect xpath expression"
-                                    console.log(" evalRes.setReply " + evalRes.setReply(response))
-                                    resolve(evalRes)
+                                    response.report.compilationErrors.push(`{${i}:incorrect xpath expression}`)
+
+
                                 }
                                 teacherNode = teacherResult.iterateNext();
                                 studentNode = studentResult.iterateNext();
                             }
-                            console.log("evalRes.setReply " + evalRes.setReply(response))
+
                         }
                     }
-
-
-
-                    resolve(evalRes)
+                    i++;
                 }
+                evalRes.setReply(response)
+                resolve(evalRes)
             } catch (error) {
                 console.log(error)
-                response.report.compilationErrors = JSON.stringify(error)
-                console.log("evalRes.setReply " + evalRes.setReply(response))
+                response.report.compilationErrors.push("impossibleToEvaluate")
+                evalRes.setReply(response)
                 resolve(evalRes)
+
             }
         })
     })
