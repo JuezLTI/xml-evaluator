@@ -70,12 +70,12 @@ function XPATH(programmingExercise, evalReq) {
                         if ("numberValue" in teacherResult)
                             if (teacherResult.numberValue != studentResult.numberValue) {
 
-                                response.report.compilationErrors.push(`{${i}:incorrect xpath expression}`)
+                                response.report.compilationErrors.push(`{"${i}":"incorrect xpath expression"}`)
 
                             }
                         if ("stringValue:" in teacherResult)
                             if (teacherResult.stringValue != studentResult.stringValue) {
-                                response.report.compilationErrors.push(`{${i}:incorrect xpath expression}`)
+                                response.report.compilationErrors.push(`{"${i}":"incorrect xpath expression"}`)
 
 
                             }
@@ -85,15 +85,13 @@ function XPATH(programmingExercise, evalReq) {
                         studentNode = studentResult.iterateNext();
                         console.log("teacher node " + teacherNode)
                         if (teacherNode == undefined) {
-                            response.report.compilationErrors.push(`{${i}:incorrect xpath expression}`)
+                            response.report.compilationErrors.push(`{"${i}":"incorrect xpath expression"}`)
 
                         } else {
                             while (teacherNode) {
                                 if (teacherNode != studentNode) {
-
-                                    response.report.compilationErrors.push(`{${i}:incorrect xpath expression}`)
-
-
+                                    response.report.compilationErrors.push(`{"${i}":"incorrect xpath expression"}`)
+                                    break;
                                 }
                                 teacherNode = teacherResult.iterateNext();
                                 studentNode = studentResult.iterateNext();
@@ -103,6 +101,7 @@ function XPATH(programmingExercise, evalReq) {
                     }
                     i++;
                 }
+
                 evalRes.setReply(response)
                 resolve(evalRes)
             } catch (error) {

@@ -317,6 +317,7 @@ class ProgrammingExercise {
         return new Promise(function(resolve, reject) {
             do_auth(EMAIL, PASS, async(token) => {
                 try {
+                    console.log(os.tmpdir())
                     const tempDir = os.tmpdir();
                     await pipeline(
                         got.stream(`${BASE_URL}/exercises/${ID}/export`, {
@@ -391,7 +392,7 @@ class ProgrammingExercise {
      *   */
 
 
-    serialize(p = this.serializedPath()) {
+    serialize(p = serializedPath()) {
             return new Promise((resolve, reject) => {
                 const directory = path.join(p, this.id)
                 try {
@@ -416,6 +417,27 @@ class ProgrammingExercise {
                     /*************************************************************************************************************************/
                     // Creating directories [solution,tests,statements]
                     // Under each one of these directories will have the metadata information as well the concreted content 
+
+                    const directory_skeletons = path.join(directory, "skeletons")
+                    if (!fs.existsSync(directory_skeletons)) {
+                        fs.mkdirSync(directory_skeletons);
+
+                        for (let metadata_skeletons of this.skeletons) {
+                            let directory_skeletons_id = path.join(directory_skeletons, metadata_skeletons.id)
+                            fs.mkdirSync(directory_skeletons_id);
+                            fs.writeFileSync(path.join(directory_skeletons_id, "metadata.json"), JSON.stringify(metadata_skeletons, null, '\t'), {
+                                encoding: "utf8",
+                                flag: 'wx'
+                            });
+                            fs.writeFileSync(path.join(directory_skeletons_id, metadata_skeletons.pathname), this.skeletons_contents[metadata_skeletons.id], {
+                                encoding: "utf8",
+                            });
+                        }
+                    }
+
+
+
+
                     const directory_solutions = path.join(directory, "solutions")
                     if (!fs.existsSync(directory_solutions)) {
                         fs.mkdirSync(directory_solutions);
@@ -519,7 +541,7 @@ class ProgrammingExercise {
          *   @param {string} p The string that represents the path where this function will read the zip file, if none path is passed the default folder is the "serialized" folder under the current directory
          *  
          *   */
-    static async deserialize(p = this.serializedPath(), filename = "response.zip") {
+    static async deserialize(p = serializedPath(), filename = "response.zip") {
         var n_programming_exercise = {}
             //deleting the .zip from the name
         var file_path = path.join(p, filename)
@@ -540,9 +562,25 @@ class ProgrammingExercise {
                 n_programming_exercise.solutions = []
                 n_programming_exercise.tests = []
                 n_programming_exercise.statements = []
+                n_programming_exercise.skeletons = []
+                    /************************************************************************************************************/
+                    //The walks of  all folders and retrieve information to build one Instance of the class ProgrammingExercise
 
-                /************************************************************************************************************/
-                //The walks of  all folders and retrieve information to build one Instance of the class ProgrammingExercise
+
+                let skeletons_path = path.join(unzip_path, 'skeletons')
+
+                n_programming_exercise.skeletons_contents = {}
+                if (fs.existsSync(skeletons_path)) {
+                    let folders = fs.readdirSync(skeletons_path)
+                    for (let folder of folders) {
+                        let skeletons_path_id = path.join(skeletons_path, folder)
+                        let metadata = JSON.parse(fs.readFileSync(path.join(skeletons_path_id, "metadata.json"), { encoding: 'utf8', flag: 'r' }))
+                        n_programming_exercise.skeletons.push(metadata)
+                        let skeleton = fs.readFileSync(path.join(skeletons_path_id, metadata.pathname), { encoding: 'utf8', flag: 'r' });
+                        n_programming_exercise.skeletons_contents[metadata.id] = skeleton
+                    }
+                }
+
                 let solutions_path = path.join(unzip_path, 'solutions')
 
                 n_programming_exercise.solutions_contents = {}
@@ -604,10 +642,16 @@ class ProgrammingExercise {
     toString() {
         return JSON.stringify(this)
     }
-    static serializedPath() {
-        return path.join(__dirname, 'serialized')
 
+}
+
+function serializedPath() {
+    let dir = path.join(__dirname, 'serialized')
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
     }
+    return dir;
+
 }
 module.exports = {
     loadSchemaYAPEXIL,

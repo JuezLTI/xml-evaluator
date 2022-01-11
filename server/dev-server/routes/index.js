@@ -67,7 +67,7 @@ router.post("/eval", function(req, res, next) {
                     if (data.includes(evalReq.request.learningObject)) {
                         ProgrammingExercise.deserialize(path.join(__dirname, "../../public/zip"), `${evalReq.request.learningObject}.zip`).
                         then((programmingExercise) => {
-                            evaluate(programmingExercise, evalReq, req, res)
+                            evaluate(programmingExercise, evalReq, req, res, next)
                         }).catch((error) => {
                             console.log("error " + error);
                             res.statusCode(500).send("The learning object request is already in cache but was not possible to read")
@@ -78,7 +78,7 @@ router.post("/eval", function(req, res, next) {
                                 .loadRemoteExerciseAuthorkit(evalReq.request.learningObject, email, password)
                                 .then((programmingExercise) => {
 
-                                    evaluate(programmingExercise, evalReq, req, res)
+                                    evaluate(programmingExercise, evalReq, req, res, next)
 
                                     data.push(programmingExercise.id);
                                     programmingExercise
@@ -115,25 +115,26 @@ router.post("/eval", function(req, res, next) {
     })
 });
 
-function evaluate(programmingExercise, evalReq, req, res) {
+function evaluate(programmingExercise, evalReq, req, res, next) {
     evaluator.XPATH(programmingExercise, evalReq).then((obj) => {
         console.log("Resposta ->" + JSON.stringify(obj))
         req.xpath_eval_result = JSON.stringify(obj);
         req.number_of_tests = programmingExercise.getTests().length
-        if (obj.reply.report.compilationErrors.length > 0) {
-            res.send("Incorrect Answer").status(200);
-        } else {
-            res.send("Correct Answer").status(200);
+            /*if (obj.reply.report.compilationErrors.length > 0) {
+                res.send("Incorrect Answer").status(200);
+            } else {
+                res.send("Correct Answer").status(200);
 
-        }
+            }
+            */
 
-
-        // next();
+        next();
     });
 }
 const FEEDBACK_MANAGER_URL = 'http://localhost:3003';
 
 router.post("/eval", function(req, res, next) {
+
     request({
             method: "POST",
             url: FEEDBACK_MANAGER_URL,
@@ -141,7 +142,7 @@ router.post("/eval", function(req, res, next) {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
-            body: { PEARL: req.xpath_eval_result, additional: { numberOfTests: req.number_of_tests } },
+            body: JSON.stringify({ PEARL: req.xpath_eval_result, additional: { numberOfTests: req.number_of_tests } })
         },
         function(error, response) {
             if (error) res.json(req.xpath_eval_result);
