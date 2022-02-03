@@ -1,8 +1,8 @@
 import express from "express";
 import { loadSchemaYAPEXIL, ProgrammingExercise } from "programming-exercise-juezlti";
 import { loadSchemaPEARL, EvaluationReport } from "evaluation-report-juezlti";
-
-
+import dotenv from 'dotenv'
+dotenv.config('../env.js');
 import evaluator from "../evaluator";
 import path from "path";
 import request from "request";
@@ -10,8 +10,7 @@ import request from "request";
 import fs from "fs";
 
 var data = [];
-const email = "info@juezlti.eu";
-const password = "Ju3zLT1.";
+
 var router = express.Router();
 
 router.get("/capabilities", function(req, res, next) {
@@ -75,7 +74,11 @@ router.post("/eval", function(req, res, next) {
                     } else {
                         loadSchemaYAPEXIL().then(() => {
                             ProgrammingExercise
-                                .loadRemoteExerciseAuthorkit(evalReq.request.learningObject, email, password)
+                                .loadRemoteExercise(evalReq.request.learningObject,{
+                                    'BASE_URL':process.env.BASE_URL,
+                                    'EMAIL':process.env.EMAIL,
+                                    'PASSWORD':process.env.PASSWORD,
+                                })
                                 .then((programmingExercise) => {
 
                                     evaluate(programmingExercise, evalReq, req, res, next)
@@ -120,15 +123,14 @@ function evaluate(programmingExercise, evalReq, req, res, next) {
         console.log("Resposta ->" + JSON.stringify(obj))
         req.xpath_eval_result = JSON.stringify(obj);
         req.number_of_tests = programmingExercise.getTests().length
-            /*if (obj.reply.report.compilationErrors.length > 0) {
-                res.send("Incorrect Answer").status(200);
+            if (obj.reply.report.compilationErrors.length > 0) {
+                res.send("Incorrect Answer\n").status(200);
             } else {
-                res.send("Correct Answer").status(200);
+                res.send("Correct Answer\n").status(200);
 
             }
-            */
-
-        next();
+            
+      //  next();
     });
 }
 const FEEDBACK_MANAGER_URL = 'http://localhost:3003';
