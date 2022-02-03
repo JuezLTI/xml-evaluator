@@ -315,7 +315,7 @@
           *  @param {string} ID   exercise's ID
          */
      static loadRemoteExercise(ID,config) {
-         console.log(config)
+       
          return new Promise(function(resolve, reject) {
              do_auth(config.BASE_URL,config.EMAIL,config.PASSWORD, async(token) => {
                  try {
