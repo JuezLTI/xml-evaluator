@@ -120,26 +120,26 @@ router.post("/eval", function(req, res, next) {
 
 function evaluate(programmingExercise, evalReq, req, res, next) {
     evaluator.XPATH(programmingExercise, evalReq).then((obj) => {
-        console.log("Resposta ->" + JSON.stringify(obj))
+       console.log("Resposta ->" + JSON.stringify(obj))
         req.xpath_eval_result = JSON.stringify(obj);
         req.number_of_tests = programmingExercise.getTests().length
-            if (obj.reply.report.compilationErrors.length > 0) {
+        /*     if (obj.reply.report.compilationErrors.length > 0) {
                 res.send("Incorrect Answer\n").status(200);
             } else {
                 res.send("Correct Answer\n").status(200);
 
-            }
+            }*/
             
-      //  next();
+        next();
     });
 }
-const FEEDBACK_MANAGER_URL = 'http://localhost:3003';
+
 
 router.post("/eval", function(req, res, next) {
 
     request({
             method: "POST",
-            url: FEEDBACK_MANAGER_URL,
+            url: process.env.FEEDBACK_MANAGER_URL,
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
@@ -147,7 +147,11 @@ router.post("/eval", function(req, res, next) {
             body: JSON.stringify({ PEARL: req.xpath_eval_result, additional: { numberOfTests: req.number_of_tests } })
         },
         function(error, response) {
-            if (error) res.json(req.xpath_eval_result);
+            
+            if (error!=null){
+                console.log(error)
+                res.json(error);
+            } 
             else res.json(response.body);
         }
     );
