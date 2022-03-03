@@ -13,32 +13,32 @@ var data = [];
 
 var router = express.Router();
 
-router.get("/capabilities", function (req, res, next) {
+router.get("/capabilities", function(req, res, next) {
     let evalRes = new EvaluationReport();
     let obj = {
         capabilities: [{
             id: "XPath-evaluator",
             features: [{
-                name: "language",
-                value: "XPath",
-            },
-            {
-                name: "version",
-                value: ".01",
-            },
-            {
-                name: "engine",
-                value: "https://www.npmjs.com/package/xpath",
-            },
+                    name: "language",
+                    value: "XPath",
+                },
+                {
+                    name: "version",
+                    value: ".01",
+                },
+                {
+                    name: "engine",
+                    value: "https://www.npmjs.com/package/xpath",
+                },
             ],
-        },],
+        }, ],
     };
 
     evalRes.setReply(obj);
     res.send(evalRes);
 });
 
-router.get("/", function (req, res) {
+router.get("/", function(req, res) {
     let text = fs.readFileSync(
         path.join(__dirname, "../../public/doc/intro.txt"), { encoding: "utf8", flag: "r" }
     );
@@ -53,7 +53,7 @@ router.get("/", function (req, res) {
     }
 });
 
-router.post("/eval", function (req, res, next) {
+router.post("/eval", function(req, res, next) {
 
     loadSchemaPEARL().then(() => {
         console.log(req.body)
@@ -65,12 +65,12 @@ router.post("/eval", function (req, res, next) {
                     let exerciseObj = new ProgrammingExercise();
                     if (data.includes(evalReq.request.learningObject)) {
                         ProgrammingExercise.deserialize(path.join(__dirname, "../../public/zip"), `${evalReq.request.learningObject}.zip`).
-                            then((programmingExercise) => {
-                                evaluate(programmingExercise, evalReq, req, res, next)
-                            }).catch((error) => {
-                                console.log("error " + error);
-                                res.statusCode(500).send("The learning object request is already in cache but was not possible to read")
-                            })
+                        then((programmingExercise) => {
+                            evaluate(programmingExercise, evalReq, req, res, next)
+                        }).catch((error) => {
+                            console.log("error " + error);
+                            res.statusCode(500).send("The learning object request is already in cache but was not possible to read")
+                        })
                     } else {
                         loadSchemaYAPEXIL().then(() => {
                             ProgrammingExercise
@@ -121,8 +121,8 @@ router.post("/eval", function (req, res, next) {
 function evaluate(programmingExercise, evalReq, req, res, next) {
     evaluator.XPATH(programmingExercise, evalReq).then((obj) => {
         console.log("Resposta ->" + JSON.stringify(obj))
-        //user id. how  does this property will work ?
-        obj.reply.report.user_id = 1
+            //user id. how  does this property will work ?
+        obj.reply.report.user_id = "201800388"
         obj.reply.report.number_of_tests = programmingExercise.getTests().length
         req.xpath_eval_result = JSON.stringify(obj);
 
@@ -134,28 +134,28 @@ function evaluate(programmingExercise, evalReq, req, res, next) {
             }*/
 
         next();
+        //  res.send(JSON.stringify(obj))
     });
 }
 
 
-router.post("/eval", function (req, res, next) {
+router.post("/eval", function(req, res, next) {
 
     request({
-        method: "POST",
-        url: process.env.FEEDBACK_MANAGER_URL,
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
+            method: "POST",
+            url: process.env.FEEDBACK_MANAGER_URL,
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ PEARL: req.xpath_eval_result })
         },
-        body: JSON.stringify({ PEARL: req.xpath_eval_result })
-    },
-        function (error, response) {
+        function(error, response) {
 
             if (error != null) {
                 console.log(error)
                 res.json(error);
-            }
-            else res.json(response.body);
+            } else res.json(response.body);
         }
     );
 });
