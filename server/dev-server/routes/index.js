@@ -122,8 +122,11 @@ function evaluate(programmingExercise, evalReq, req, res, next) {
     evaluator.XPATH(programmingExercise, evalReq).then((obj) => {
         console.log("Resposta ->" + JSON.stringify(obj))
             //user id. how  does this property will work ?
-        obj.reply.report.user_id = "201800388"
+        obj.reply.report.user_id = evalReq.studentID
         obj.reply.report.number_of_tests = programmingExercise.getTests().length
+        let x = ([...Array(obj.reply.report.number_of_tests).keys()].filter((value) => { return !(value.toString() in obj.reply.report.compilationErrors) }))
+        obj.reply.report.number_of_incorrect_tests = Object.keys(obj.reply.report.compilationErrors);
+        obj.reply.report.number_of_correct_tests = x;
         req.xpath_eval_result = JSON.stringify(obj);
 
         /*     if (obj.reply.report.compilationErrors.length > 0) {
