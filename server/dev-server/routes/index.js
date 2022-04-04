@@ -56,6 +56,7 @@ router.get("/", function(req, res) {
 router.post("/eval", function(req, res, next) {
 
     loadSchemaPEARL().then(() => {
+        console.log("incoming")
         console.log(req.body)
 
         let evalReq = new EvaluationReport();
@@ -121,7 +122,6 @@ router.post("/eval", function(req, res, next) {
 function evaluate(programmingExercise, evalReq, req, res, next) {
     evaluator.XPATH(programmingExercise, evalReq).then((obj) => {
         console.log("Resposta ->" + JSON.stringify(obj))
-            //user id. how  does this property will work ?
         obj.reply.report.user_id = evalReq.studentID
         obj.reply.report.number_of_tests = programmingExercise.getTests().length
         let x = ([...Array(obj.reply.report.number_of_tests).keys()].filter((value) => { return !(value.toString() in obj.reply.report.compilationErrors) }))
@@ -129,15 +129,9 @@ function evaluate(programmingExercise, evalReq, req, res, next) {
         obj.reply.report.number_of_correct_tests = x;
         req.xpath_eval_result = JSON.stringify(obj);
 
-        /*     if (obj.reply.report.compilationErrors.length > 0) {
-                res.send("Incorrect Answer\n").status(200);
-            } else {
-                res.send("Correct Answer\n").status(200);
 
-            }*/
 
         next();
-        //  res.send(JSON.stringify(obj))
     });
 }
 
