@@ -120,10 +120,13 @@ function normalizeData(data) {
 
         }
         if ("feedback" in t) {
-            if (!("message" in t.feedback)) {
-                t.feedback.message = "no feedback"
+            if (t.feedback == "" || (t.feedback instanceof Object && !("message" in t.feedback))) {
+                delete(t.feedback)
             }
         }
+
+
+
     })
 }
 
@@ -400,8 +403,26 @@ class ProgrammingExercise {
                     });
 
                     /*************************************************************************************************************************/
-                    // Creating directories [solution,tests,statements,skeletons]
+                    // Creating directories [solution,tests,statements,skeletons,libraries]
                     // Under each one of these directories will have the metadata information as well the concreted content 
+
+                    const directory_libraries = path.join(directory, "libraries")
+                    if (!fs.existsSync(directory_libraries)) {
+                        fs.mkdirSync(directory_libraries);
+
+                        for (let metadata_libraries of this.libraries) {
+                            let directory_libraries_id = path.join(directory_libraries, metadata_libraries.id)
+                            fs.mkdirSync(directory_libraries_id);
+                            fs.writeFileSync(path.join(directory_libraries_id, "metadata.json"), JSON.stringify(metadata_libraries, null, '\t'), {
+                                encoding: "utf8",
+                                flag: 'wx'
+                            });
+                            fs.writeFileSync(path.join(directory_libraries_id, metadata_libraries.pathname), this.libraries_contents[metadata_libraries.id], {
+                                encoding: "utf8",
+                            });
+                        }
+                    }
+
 
                     if (Symbol.iterator in Object(this.skeletons)) {
                         const directory_skeletons = path.join(directory, "skeletons")
@@ -557,12 +578,31 @@ class ProgrammingExercise {
                 n_programming_exercise.tests = []
                 n_programming_exercise.statements = []
                 n_programming_exercise.skeletons = []
+                n_programming_exercise.libraries = []
                     /************************************************************************************************************/
                     //The walks of  all folders and retrieve information to build one Instance of the class ProgrammingExercise
 
 
-                let skeletons_path = path.join(unzip_path, 'skeletons')
+                let libraries_path = path.join(unzip_path, 'libraries')
 
+                n_programming_exercise.libraries_contents = {}
+                if (fs.existsSync(libraries_path)) {
+                    let folders = fs.readdirSync(libraries_path)
+                    for (let folder of folders) {
+                        let libraries_path_id = path.join(libraries_path, folder)
+                        let metadata = JSON.parse(fs.readFileSync(path.join(libraries_path_id, "metadata.json"), { encoding: 'utf8', flag: 'r' }))
+                        n_programming_exercise.libraries.push(metadata)
+                        let skeleton = fs.readFileSync(path.join(libraries_path_id, metadata.pathname), { encoding: 'utf8', flag: 'r' });
+                        n_programming_exercise.libraries_contents[metadata.id] = skeleton
+                    }
+                }
+
+
+
+
+
+
+                let skeletons_path = path.join(unzip_path, 'skeletons')
                 n_programming_exercise.skeletons_contents = {}
                 if (fs.existsSync(skeletons_path)) {
                     let folders = fs.readdirSync(skeletons_path)
