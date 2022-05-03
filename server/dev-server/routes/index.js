@@ -94,13 +94,9 @@ router.post("/eval", function(req, res, next) {
                                                 );
                                             }
                                         });
-
-
-
-
                                 }).catch((error) => {
-                                    console.log(error)
-                                    console.log(" 1º error LearningObj not found or could not be loaded");
+
+                                    console.log(" 1º " + error);
                                     res.send({ error: "LearningObj not found" });
                                 });
 
@@ -121,23 +117,16 @@ router.post("/eval", function(req, res, next) {
 
 function evaluate(programmingExercise, evalReq, req, res, next) {
     evaluator.XPATH(programmingExercise, evalReq).then((obj) => {
-        console.log("Resposta ->" + JSON.stringify(obj))
+
+        console.log(JSON.stringify(obj))
         obj.reply.report.user_id = evalReq.studentID
-        obj.reply.report.number_of_tests = programmingExercise.getTests().length
-        let x = ([...Array(obj.reply.report.number_of_tests).keys()].filter((value) => { return !(value.toString() in obj.reply.report.compilationErrors) }))
-        obj.reply.report.number_of_incorrect_tests = Object.keys(obj.reply.report.compilationErrors);
-        obj.reply.report.number_of_correct_tests = x;
         req.xpath_eval_result = JSON.stringify(obj);
-
-
-
         next();
     });
 }
 
 
 router.post("/eval", function(req, res, next) {
-
     request({
             method: "POST",
             url: process.env.FEEDBACK_MANAGER_URL,

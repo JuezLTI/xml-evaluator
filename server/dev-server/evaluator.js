@@ -9,6 +9,7 @@ function XPATH(programmingExercise, evalReq) {
             let evalRes = new EvaluationReport();
             evalRes.setRequest(evalReq.request)
             let program = evalReq.request.program
+            const compilationErrors = [];
             let response = {}
             response.report = {}
             response.report.capability = {
@@ -26,7 +27,7 @@ function XPATH(programmingExercise, evalReq) {
             }
 
             response.report.exercise = programmingExercise.id
-            response.report.compilationErrors = [];
+            response.report.tests = []
             try {
 
                 let solution_id = ""
@@ -39,6 +40,17 @@ function XPATH(programmingExercise, evalReq) {
                 const solution = programmingExercise.solutions_contents[solution_id]
                 let i = 0;
                 for (let metadata of programmingExercise.tests) {
+                    let testPEARinstance = {}
+
+                    testPEARinstance.input = programmingExercise.tests_contents_in[metadata.id]
+                    testPEARinstance.expectedOutput = solution
+                    testPEARinstance.obtainedOutput = program
+                    testPEARinstance.mark = metadata.weight
+                    testPEARinstance.feedback = ""
+                    testPEARinstance.environmentValues = []
+                        //remove
+                    testPEARinstance.outputDifferences = "";
+
                     let input = new DOMParser().parseFromString(programmingExercise.tests_contents_in[metadata.id]);
                     let teacherNode = null,
                         studentNode = null;
@@ -52,30 +64,23 @@ function XPATH(programmingExercise, evalReq) {
                         null // result
                     )
                     var studentResult = xpath.evaluate(
-                            program, // xpathExpression
-                            input, // contextNode
-                            null, // namespaceResolver
-                            xpath.XPathResult.ANY_TYPE, // resultType
-                            null // result
-                        )
-                        /*
-        console.log(solution)
-        console.log(program)
+                        program, // xpathExpression
+                        input, // contextNode
+                        null, // namespaceResolver
+                        xpath.XPathResult.ANY_TYPE, // resultType
+                        null // result
+                    )
 
-        console.log(teacherResult)
-
-        console.log(studentResult)
-            */
                     if (teacherResult.resultType == 1 || teacherResult.resultType == 2) {
                         if ("numberValue" in teacherResult)
                             if (teacherResult.numberValue != studentResult.numberValue) {
 
-                                response.report.compilationErrors.push(`{"${i}":"incorrect xpath expression"}`)
+                                compilationErrors.push({ i: "incorrect xpath expression" })
 
                             }
                         if ("stringValue:" in teacherResult)
                             if (teacherResult.stringValue != studentResult.stringValue) {
-                                response.report.compilationErrors.push(`{"${i}":"incorrect xpath expression"}`)
+                                compilationErrors.push({ i: "incorrect xpath expression" })
 
 
                             }
@@ -85,12 +90,11 @@ function XPATH(programmingExercise, evalReq) {
                         studentNode = studentResult.iterateNext();
                         console.log("teacher node " + teacherNode)
                         if (teacherNode == undefined) {
-                            response.report.compilationErrors.push(`{"${i}":"incorrect xpath expression"}`)
-
+                            compilationErrors.push({ i: "incorrect xpath expression" })
                         } else {
                             while (teacherNode) {
                                 if (teacherNode != studentNode) {
-                                    response.report.compilationErrors.push(`{"${i}":"incorrect xpath expression"}`)
+                                    compilationErrors.push({ i: "incorrect xpath expression" })
                                     break;
                                 }
                                 teacherNode = teacherResult.iterateNext();
@@ -99,6 +103,9 @@ function XPATH(programmingExercise, evalReq) {
 
                         }
                     }
+
+                    testPEARinstance.classify = compilationErrors.length > 0 ? "Wrong Answer" : "Accepted";
+                    response.report.tests.push(testPEARinstance)
                     i++;
                 }
 
@@ -106,7 +113,7 @@ function XPATH(programmingExercise, evalReq) {
                 resolve(evalRes)
             } catch (error) {
                 console.log(error)
-                response.report.compilationErrors.push("impossibleToEvaluate")
+                testPEARinstance.classify = "Runtime Error"
                 evalRes.setReply(response)
                 resolve(evalRes)
 
