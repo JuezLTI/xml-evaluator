@@ -134,7 +134,7 @@ router.post("/eval", function(req, res, next) {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ PEARL: req.xpath_eval_result })
+            body: { "PEARL": req.xpath_eval_result }
         },
         function(error, response) {
 
