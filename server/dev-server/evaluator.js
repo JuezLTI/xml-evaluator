@@ -5,12 +5,16 @@ import { loadSchemaPEARL, EvaluationReport } from "evaluation-report-juezlti";
 function XPATH(programmingExercise, evalReq) {
     return new Promise((resolve) => {
         loadSchemaPEARL().then(() => {
+            var evalRes = new EvaluationReport(),
+                response = {},
+                summary = {
+                    "classify" : 'Accepted',
+                    "feedback" : 'Well done'
+                }
 
-            let evalRes = new EvaluationReport();
             evalRes.setRequest(evalReq.request)
             let program = evalReq.request.program
             const compilationErrors = [];
-            let response = {}
             response.report = {}
             response.report.capability = {
                 "id": "XPath-evaluator",
@@ -103,20 +107,27 @@ function XPATH(programmingExercise, evalReq) {
 
                         }
                     }
-
+                    if(compilationErrors.length > 0) {
+                        summary = {
+                            "classify" : 'Wrong Answer',
+                            "feedback" : 'Try it again'
+                        }
+                    }
                     testPEARinstance.classify = compilationErrors.length > 0 ? "Wrong Answer" : "Accepted";
                     response.report.tests.push(testPEARinstance)
                     i++;
                 }
-
-                evalRes.setReply(response)
-                resolve(evalRes)
             } catch (error) {
                 console.log(error)
-                testPEARinstance.classify = "Runtime Error"
+                let summary = {
+                    "classify" : "Compile Time Error",
+                    "feedback" : error.message
+                }
+                evalRes.summary = summary
+            } finally {
                 evalRes.setReply(response)
+                evalRes.summary = summary
                 resolve(evalRes)
-
             }
         })
     })
