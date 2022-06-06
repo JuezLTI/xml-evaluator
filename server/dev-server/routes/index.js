@@ -118,9 +118,10 @@ router.post("/eval", function(req, res, next) {
 function evaluate(programmingExercise, evalReq, req, res, next) {
     evaluator.XPATH(programmingExercise, evalReq).then((obj) => {
 
-        console.log(JSON.stringify(obj))
+
         obj.reply.report.user_id = evalReq.studentID
-        req.xpath_eval_result = JSON.stringify(obj);
+        req.xpath_eval_result = obj;
+
         next();
     });
 }
@@ -134,7 +135,7 @@ router.post("/eval", function(req, res, next) {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
-            body: { "PEARL": req.xpath_eval_result }
+            body: JSON.stringify(req.xpath_eval_result)
         },
         function(error, response) {
 
