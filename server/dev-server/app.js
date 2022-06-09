@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-import { router as indexRouter, data } from './routes/index';
+import { router as indexRouter } from './routes/index';
 import createError from 'http-errors';
 import * as cons from 'consolidate';
 
@@ -18,11 +18,6 @@ app.engine('html', cons.swig)
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'html');
 
-
-
-
-
-app.cacheExercise = data
 
 app.use(logger('dev'));
 app.use(express.json());
