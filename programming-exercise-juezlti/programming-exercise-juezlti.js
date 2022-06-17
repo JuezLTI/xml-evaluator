@@ -405,24 +405,24 @@ class ProgrammingExercise {
                     /*************************************************************************************************************************/
                     // Creating directories [solution,tests,statements,skeletons,libraries]
                     // Under each one of these directories will have the metadata information as well the concreted content 
+                    if (Symbol.iterator in Object(this.libraries)) {
+                        const directory_libraries = path.join(directory, "libraries")
+                        if (!fs.existsSync(directory_libraries)) {
+                            fs.mkdirSync(directory_libraries);
 
-                    const directory_libraries = path.join(directory, "libraries")
-                    if (!fs.existsSync(directory_libraries)) {
-                        fs.mkdirSync(directory_libraries);
-
-                        for (let metadata_libraries of this.libraries) {
-                            let directory_libraries_id = path.join(directory_libraries, metadata_libraries.id)
-                            fs.mkdirSync(directory_libraries_id);
-                            fs.writeFileSync(path.join(directory_libraries_id, "metadata.json"), JSON.stringify(metadata_libraries, null, '\t'), {
-                                encoding: "utf8",
-                                flag: 'wx'
-                            });
-                            fs.writeFileSync(path.join(directory_libraries_id, metadata_libraries.pathname), this.libraries_contents[metadata_libraries.id], {
-                                encoding: "utf8",
-                            });
+                            for (let metadata_libraries of this.libraries) {
+                                let directory_libraries_id = path.join(directory_libraries, metadata_libraries.id)
+                                fs.mkdirSync(directory_libraries_id);
+                                fs.writeFileSync(path.join(directory_libraries_id, "metadata.json"), JSON.stringify(metadata_libraries, null, '\t'), {
+                                    encoding: "utf8",
+                                    flag: 'wx'
+                                });
+                                fs.writeFileSync(path.join(directory_libraries_id, metadata_libraries.pathname), this.libraries_contents[metadata_libraries.id], {
+                                    encoding: "utf8",
+                                });
+                            }
                         }
                     }
-
 
                     if (Symbol.iterator in Object(this.skeletons)) {
                         const directory_skeletons = path.join(directory, "skeletons")
