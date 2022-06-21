@@ -23,7 +23,7 @@ const Ajv = require("ajv")
 const addFormats = require("ajv-formats")
 const ajv = new Ajv()
 addFormats(ajv)
-const YAPEXIL_URI = 'https://raw.githubusercontent.com/KA226-COVID/APIs/main/schemas/YAPEXIL/YAPEXIL.json';
+const YAPEXIL_URI = 'https://raw.githubusercontent.com/JuezLTI/APIs/main/schemas/YAPEXIL/YAPEXIL.json';
 
 /****************************************************************/
 //Adding some formats needed to yapexil.schema.json be valid
