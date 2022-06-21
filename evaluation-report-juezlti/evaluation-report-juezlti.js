@@ -7,7 +7,7 @@ const fs = require("fs");
 const got = require('got');
 
 /****************************************************************/
-const PEARL_URI = 'https://raw.githubusercontent.com/KA226-COVID/APIs/main/schemas/PEARL/PEARL.json';
+const PEARL_URI = 'https://raw.githubusercontent.com/JuezLTI/APIs/main/schemas/PEARL/PEARL.json';
 
 async function loadSchemaPEARL(uri = PEARL_URI) {
     if (EvaluationReport.validate == null) {

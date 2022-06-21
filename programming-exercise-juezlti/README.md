@@ -49,7 +49,7 @@ programmingExercise.serialize(path_to_folder).then(() => {
 })
 ```
 ### Creating an exercise programmatically 
-In order to create an exercise programmatically, the user needs to have in his possession the correct values that fit the YAPEXIL schema. More information about the schema could be found at  [YAPEXIL Github](https://raw.githubusercontent.com/KA226-COVID/APIs/main/schemas/YAPEXIL/YAPEXIL.json)
+In order to create an exercise programmatically, the user needs to have in his possession the correct values that fit the YAPEXIL schema. More information about the schema could be found at  [YAPEXIL Github](https://raw.githubusercontent.com/JuezLTI/APIs/main/schemas/YAPEXIL/YAPEXIL.json)
 
 
 ## Installation
