@@ -60,11 +60,11 @@ router.post("/eval", function(req, res, next) {
         let evalReq = new EvaluationReport();
         if (evalReq.setRequest(req.body)) {
             if ("program" in evalReq.request) {
-                ProgrammingExercise.deserialize(path.join(__dirname, "../../public/zip"), `${evalReq.request.learningObject}.zip`).
-                    then((programmingExercise) => {
-                        evaluate(programmingExercise, evalReq, req, res, next)
+                loadSchemaYAPEXIL().then(() => {
+                    ProgrammingExercise.deserialize(path.join(__dirname, "../../public/zip"), `${evalReq.request.learningObject}.zip`).
+                        then((programmingExercise) => {
+                            evaluate(programmingExercise, evalReq, req, res, next)
                     }).catch((error) => {
-                        loadSchemaYAPEXIL().then(() => {
                             ProgrammingExercise
                                 .loadRemoteExercise(evalReq.request.learningObject, {
                                     'BASE_URL': process.env.BASE_URL,
@@ -89,7 +89,7 @@ router.post("/eval", function(req, res, next) {
                                     console.log(" 1º error LearningObj not found or could not be loaded");
                                     res.send({ error: "LearningObj not found" });
                                 });
-                        })
+                            })
                     })
             }
         } else {
