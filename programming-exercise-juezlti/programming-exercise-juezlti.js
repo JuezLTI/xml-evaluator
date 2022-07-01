@@ -120,12 +120,13 @@ function normalizeData(data) {
 
         }
         if ("feedback" in t) {
-            if (t.feedback == "" || (t.feedback instanceof Object && !("message" in t.feedback))) {
-                delete(t.feedback)
+            for (let f of t.feedback) {
+                if (typeof f.weight == "string") {
+                    f.weight = parseInt(f.weight)
+                }
             }
+
         }
-
-
 
     })
 }
