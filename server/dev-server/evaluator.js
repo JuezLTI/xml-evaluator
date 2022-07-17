@@ -169,7 +169,7 @@ function DTD(programmingExercise, evalReq, studentID) {
                     "value": "1.0"
                 }, {
                     "name": "engine",
-                    "value": "https://www.npmjs.com/package/w3c-xml-validator"
+                    "value": "https://www.npmjs.com/package/node-libxml"
                 }]
             }
 

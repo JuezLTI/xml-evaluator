@@ -7,7 +7,7 @@ import evaluator from "../evaluator";
 import path from "path";
 import request from "request";
 import Cache from "cache";
-const cache = new Cache(60 * 10000); // Create a cache with 600 second TTL
+var cache = new Cache(60 * 10000); // Create a cache with 600 second TTL
 import fs from "fs";
 
 
@@ -37,6 +37,15 @@ router.get("/capabilities", function(req, res, next) {
     evalRes.setReply(obj);
     res.send(evalRes);
 });
+
+router.get("/invalidate-cache", function(req, res, next) {
+    var cache = undefined;
+    cache = new Cache(60 * 10000);
+    res.send("Ok");
+});
+
+
+
 
 router.get("/", function(req, res) {
     let text = fs.readFileSync(
@@ -152,6 +161,7 @@ async function getProgrammingExercise(evalReq) {
         return programmingExercise;
 
     } else {
+        cache.put(evalReq.request.learningObject, programmingExercise)
         return programmingExercise;
     }
 }
