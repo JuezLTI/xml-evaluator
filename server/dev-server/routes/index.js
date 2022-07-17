@@ -107,6 +107,7 @@ router.post("/eval", async function(req, res, next) {
 
 
 async function evaluate(req) {
+
     const evalReq = new EvaluationReport();
     if (!evalReq.setRequest(req.body)) {
 
@@ -116,10 +117,13 @@ async function evaluate(req) {
 
     if ("program" in evalReq.request) {
         const programmingExercise = await getProgrammingExercise(evalReq);
-        const assesment = await evaluator.XPATH(programmingExercise, evalReq)
-        return assesment;
-
-
+        if (programmingExercise.programmingLanguages[0].toUpperCase() == "XPATH") {
+            const assesment = await evaluator.XPATH(programmingExercise, evalReq)
+            return assesment;
+        } else if (programmingExercise.programmingLanguages[0].toUpperCase() == "DTD") {
+            const assesment = await evaluator.DTD(programmingExercise, evalReq, req.body.studentID)
+            return assesment;
+        }
 
     }
 }
