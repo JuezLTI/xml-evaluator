@@ -3,7 +3,6 @@ import { loadSchemaYAPEXIL, ProgrammingExercise } from "programming-exercise-jue
 import { loadSchemaPEARL, EvaluationReport } from "evaluation-report-juezlti";
 import dotenv from 'dotenv'
 dotenv.config('../env.js');
-import evaluator from "../evaluator";
 import path from "path";
 import request from "request";
 import Cache from "cache";
@@ -39,7 +38,7 @@ router.get("/capabilities", function(req, res, next) {
 });
 
 router.get("/invalidate-cache", function(req, res, next) {
-    var cache = undefined;
+    cache = undefined;
     cache = new Cache(60 * 10000);
     res.send("Ok");
 });
@@ -123,18 +122,19 @@ async function evaluate(req) {
         console.log("INVALID PEARL")
         throw new Error("INVALID PEARL");
     }
+    const programmingExercise = await getProgrammingExercise(evalReq);
 
-    if ("program" in evalReq.request) {
-        const programmingExercise = await getProgrammingExercise(evalReq);
-        if (programmingExercise.programmingLanguages[0].toUpperCase() == "XPATH") {
-            const assesment = await evaluator.XPATH(programmingExercise, evalReq)
-            return assesment;
-        } else if (programmingExercise.programmingLanguages[0].toUpperCase() == "DTD") {
-            const assesment = await evaluator.DTD(programmingExercise, evalReq, req.body.studentID)
-            return assesment;
-        }
-
+    var assesment = undefined
+    const target = programmingExercise.programmingLanguages[0].toLowerCase()
+    try {
+        var evaluator = require(`../evaluators/${target}.js`);
+        assesment = await evaluator.perform(programmingExercise, evalReq, req.body.studentID)
+        return assesment;
+    } catch (ex) {
+        console.log(ex)
+        throw new Error(`Invalid evaluator module '${target}.js'`);
     }
+
 }
 
 
