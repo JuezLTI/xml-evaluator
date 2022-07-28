@@ -23,7 +23,7 @@ const Ajv = require("ajv")
 const addFormats = require("ajv-formats")
 const ajv = new Ajv()
 addFormats(ajv)
-const YAPEXIL_URI = 'https://raw.githubusercontent.com/JuezLTI/APIs/main/schemas/YAPEXIL/YAPEXIL.json';
+const YAPEXIL_URI = 'https://raw.githubusercontent.com/KA226-COVID/APIs/main/schemas/YAPEXIL/YAPEXIL.json';
 
 /****************************************************************/
 //Adding some formats needed to yapexil.schema.json be valid
@@ -147,7 +147,7 @@ class ProgrammingExercise {
     BASE_URL = "";
     EMAIL = "";
     PASSWORD = "";
-    constructor(exercise) {
+    constructor(exercise, isNecessaryContent) {
         if (exercise != undefined) {
             if (ProgrammingExercise.isValid(exercise))
                 Object.assign(this, exercise)
@@ -178,7 +178,20 @@ class ProgrammingExercise {
                 nat_lang: 'en',
                 format: 'HTML'
             }, ]
-
+            if (isNecessaryContent) {
+                this.solutions_contents = {
+                    "00000000-0000-0000-0000-000000000000": ""
+                }
+                this.tests_contents_in = {
+                    "00000000-0000-0000-0000-000000000000": ""
+                }
+                this.tests_contents_out = {
+                    "00000000-0000-0000-0000-000000000000": ""
+                }
+                this.statements_contents = {
+                    "00000000-0000-0000-0000-000000000000": ""
+                }
+            }
 
 
 
