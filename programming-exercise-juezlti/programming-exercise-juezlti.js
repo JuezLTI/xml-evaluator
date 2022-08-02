@@ -670,7 +670,15 @@ class ProgrammingExercise {
                         let statement_path_id = path.join(statement_path, folder)
                         let metadata = JSON.parse(fs.readFileSync(path.join(statement_path_id, "metadata.json"), { encoding: 'utf8', flag: 'r' }))
                         n_programming_exercise.statements.push(metadata)
-                        let statement = fs.readFileSync(path.join(statement_path_id, metadata.pathname), { encoding: 'utf8', flag: 'r' });
+                        let statement;
+                        if (metadata.format.toUpperCase() == "PDF") {
+                            statement = fs.readFileSync(path.join(statement_path_id, metadata.pathname), { encoding: 'base64', flag: 'r' });
+
+                        } else {
+                            statement = fs.readFileSync(path.join(statement_path_id, metadata.pathname), { encoding: 'utf8', flag: 'r' });
+                        }
+
+
                         n_programming_exercise.statements_contents[metadata.id] = statement
                     }
                 }
