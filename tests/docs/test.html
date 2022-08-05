@@ -1,0 +1,259 @@
+    <section class="suite">
+      <h1>Test for ProgrammingExercise</h1>
+      <dl>
+/tmp
+        <dt>Test metadata of an exercise fetched using authokit-api </dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/programming-exercise-juezlti.js</dt>
+        <dd><pre><code>async function() {
+        let programmingExercise = await ProgrammingExercise.loadRemoteExercise(&#x22;18177460-840a-4c57-8c24-d671ad9f5f95&#x22;, config)
+        expect(ProgrammingExercise.isValid(programmingExercise)).to.equal(true);
+    }</code></pre></dd>
+/tmp
+        <dt>Test deserialization and serialization </dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/programming-exercise-juezlti.js</dt>
+        <dd><pre><code>async function() {
+        let programmingExercise = await ProgrammingExercise.loadRemoteExercise(&#x22;c9d68b4f-e306-41f5-bba3-cafdcd024bfb&#x22;, config)
+        await programmingExercise.serialize(path.join(__dirname, &#x27;resources&#x27;))
+        let exerciseObj2 = await ProgrammingExercise.deserialize(path.join(__dirname, &#x27;resources&#x27;), &#x60;${programmingExercise.id}.zip&#x60;)
+        expect(ProgrammingExercise.isValid(exerciseObj2)).to.equal(true);
+    }</code></pre></dd>
+        <dt>Test setID</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/programming-exercise-juezlti.js</dt>
+        <dd><pre><code>let exerciseObj = new ProgrammingExercise()
+expect(exerciseObj.setId(uuid.v4())).to.equal(true)</code></pre></dd>
+        <dt>Test setTitle</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/programming-exercise-juezlti.js</dt>
+        <dd><pre><code>let exerciseObj = new ProgrammingExercise()
+expect(exerciseObj.setTitle(
+    randomstring.generate({
+        length: Math.random() * (100),
+        charset: &#x27;alphabetic&#x27;
+    })
+)).to.equal(true)</code></pre></dd>
+        <dt>Test setAuthor</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/programming-exercise-juezlti.js</dt>
+        <dd><pre><code>let exerciseObj = new ProgrammingExercise()
+expect(exerciseObj.setAuthor(
+    randomstring.generate({
+        length: Math.random() * (100),
+        charset: &#x27;alphabetic&#x27;
+    })
+)).to.equal(true)</code></pre></dd>
+        <dt>Test setKeywords</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/programming-exercise-juezlti.js</dt>
+        <dd><pre><code>let exerciseObj = new ProgrammingExercise()
+let list = []
+for (let i in (Math.random() * 20)) {
+    list.push(
+        randomstring.generate({
+            length: Math.random() * (100),
+            charset: &#x27;alphabetic&#x27;
+        })
+    )
+}
+expect(exerciseObj.setKeywords(list)).to.equal(true)</code></pre></dd>
+        <dt>Test setStatus</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/programming-exercise-juezlti.js</dt>
+        <dd><pre><code>let exerciseObj = new ProgrammingExercise()
+let list = [
+    &#x22;DRAFT&#x22;,
+    &#x22;PUBLISHED&#x22;,
+    &#x22;UNPUBLISHED&#x22;,
+    &#x22;TRASH&#x22;
+]
+expect(exerciseObj.setStatus(
+    list[
+        Math.round(Math.random() * (3))
+    ]
+)).to.equal(true)</code></pre></dd>
+        <dt>Test setType</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/programming-exercise-juezlti.js</dt>
+        <dd><pre><code>let exerciseObj = new ProgrammingExercise()
+let list = [
+    &#x22;BLANK_SHEET&#x22;,
+    &#x22;EXTENSION&#x22;,
+    &#x22;IMPROVEMENT&#x22;,
+    &#x22;BUG_FIX&#x22;,
+    &#x22;FILL_IN_GAPS&#x22;,
+    &#x22;SORT_BLOCKS&#x22;,
+    &#x22;SPOT_BUG&#x22;
+]
+expect(exerciseObj.setType(
+    list[
+        Math.round(Math.random() * (6))
+    ]
+)).to.equal(true)</code></pre></dd>
+        <dt>Test setTest</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/programming-exercise-juezlti.js</dt>
+        <dd><pre><code>let exerciseObj = new ProgrammingExercise()
+expect(exerciseObj.setTests(
+    [{
+        id: &#x27;00000000-0000-0000-0000-000000000000&#x27;,
+        arguments: [],
+        weight: 5,
+        visible: true,
+        input: &#x27;input1.txt&#x27;,
+        output: &#x27;output1.txt&#x27;
+    }]
+)).to.equal(true)</code></pre></dd>
+        <dt>Test setStatements</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/programming-exercise-juezlti.js</dt>
+        <dd><pre><code>let exerciseObj = new ProgrammingExercise()
+expect(exerciseObj.setStatements(
+    [{
+        id: &#x27;00000000-0000-0000-0000-000000000000&#x27;,
+        pathname: &#x27;statements.html&#x27;,
+        nat_lang: &#x27;en&#x27;,
+        format: &#x27;HTML&#x27;
+    }, ]
+)).to.equal(true)</code></pre></dd>
+        <dt>Test setSolutions</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/programming-exercise-juezlti.js</dt>
+        <dd><pre><code>let exerciseObj = new ProgrammingExercise()
+expect(exerciseObj.setSolutions(
+    [{
+        id: &#x27;00000000-0000-0000-0000-000000000000&#x27;,
+        pathname: &#x27;solution.cpp&#x27;,
+        lang: &#x27;cpp&#x27;
+    }]
+)).to.equal(true)</code></pre></dd>
+      </dl>
+    </section>
+    <section class="suite">
+      <h1>Test for EvaluationReport</h1>
+      <dl>
+        <dt>Testing setId </dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/evaluation-report-juezlti.js</dt>
+        <dd><pre><code>let evaluationReport = new EvaluationReport()
+expect(evaluationReport.setId(&#x27;00000000-0000-0000-0000-000000000000&#x27;)).to.equal(true);</code></pre></dd>
+        <dt>Testing setDate </dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/evaluation-report-juezlti.js</dt>
+        <dd><pre><code>let evaluationReport = new EvaluationReport()
+expect(evaluationReport.setDate(&#x27;2020-10-22T05:30:22.569Z&#x27;)).to.equal(true);</code></pre></dd>
+        <dt>Testing setReply</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/evaluation-report-juezlti.js</dt>
+        <dd><pre><code>let evaluationReport = new EvaluationReport()
+expect(evaluationReport.setReply({
+    &#x22;token&#x22;: 123
+})).to.equal(true)</code></pre></dd>
+        <dt>Testing setRequest</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/evaluation-report-juezlti.js</dt>
+        <dd><pre><code>let evaluationReport = new EvaluationReport()
+expect(evaluationReport.setRequest({
+    &#x22;date&#x22;: &#x60;${(new Date()).toISOString()}&#x60;,
+    &#x22;program&#x22;: &#x22;count(//node())&#x22;,
+    &#x22;learningObject&#x22;: &#x22;00000000-0000-0000-0000-000000000000&#x22;
+})).to.equal(true)</code></pre></dd>
+      </dl>
+    </section>
+    <section class="suite">
+      <h1>xpath</h1>
+      <dl>
+/tmp
+        <dt>c9d68b4f-e306-41f5-bba3-cafdcd024bfb  VALID</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/evaluators.js</dt>
+        <dd><pre><code>async function() {
+        await loadSchemaPEARL();
+        await loadSchemaYAPEXIL();
+        let programmingExercise = await ProgrammingExercise.loadRemoteExercise(&#x22;c9d68b4f-e306-41f5-bba3-cafdcd024bfb&#x22;, config)
+        const evalReq = new EvaluationReport();
+        evalReq.setRequest({
+            &#x22;date&#x22;: (new Date()).toISOString(),
+            &#x22;program&#x22;: &#x22;concat(person/lastName, \&#x22; \&#x22; ,person/firstName)&#x22;,
+            &#x22;learningObject&#x22;: &#x22;c9d68b4f-e306-41f5-bba3-cafdcd024bfb&#x22;,
+        })
+        let assesment = await xpath.perform(programmingExercise, evalReq, &#x22;201800388&#x22;)
+        assert.equal(assesment.summary.classify, &#x22;Accepted&#x22;);
+    }</code></pre></dd>
+/tmp
+        <dt>c9d68b4f-e306-41f5-bba3-cafdcd024bfb  INVALID</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/evaluators.js</dt>
+        <dd><pre><code>async function() {
+        await loadSchemaPEARL();
+        await loadSchemaYAPEXIL();
+        let programmingExercise = await ProgrammingExercise.loadRemoteExercise(&#x22;c9d68b4f-e306-41f5-bba3-cafdcd024bfb&#x22;, config)
+        const evalReq = new EvaluationReport();
+        evalReq.setRequest({
+            &#x22;date&#x22;: (new Date()).toISOString(),
+            &#x22;program&#x22;: &#x22;concat(pson/lastName, \&#x22;\&#x22; ,peron/firstName)&#x22;,
+            &#x22;learningObject&#x22;: &#x22;c9d68b4f-e306-41f5-bba3-cafdcd024bfb&#x22;,
+        })
+        let assesment = await xpath.perform(programmingExercise, evalReq, &#x22;201800388&#x22;)
+        assert.equal(assesment.summary.classify, &#x22;Wrong Answer&#x22;);
+    }</code></pre></dd>
+      </dl>
+    </section>
+    <section class="suite">
+      <h1>DTD</h1>
+      <dl>
+/tmp
+        <dt>3d7c802a-27fe-4437-8a48-8e379583a570  VALID</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/evaluators.js</dt>
+        <dd><pre><code>async function() {
+        await loadSchemaPEARL();
+        await loadSchemaYAPEXIL();
+        let programmingExercise = await ProgrammingExercise.loadRemoteExercise(&#x22;3d7c802a-27fe-4437-8a48-8e379583a570&#x22;, config)
+        const evalReq = new EvaluationReport();
+        evalReq.setRequest({
+            &#x22;date&#x22;: (new Date()).toISOString(),
+            &#x22;program&#x22;: &#x22;\&#x22;&#x3C;!ELEMENT STORY (title, context, problem, goal, THREADS, moral, INFOS)&#x3E;\\n&#x3C;!ATTLIST STORY xmlns:xlink CDATA #FIXED \\\&#x22;http://www.w3.org/1999/xlink\\\&#x22;&#x3E;\\n&#x3C;!ELEMENT THREADS (EPISODE+)&#x3E;\\n&#x3C;!ELEMENT EPISODE (subgoal, ATTEMPT+, result) &#x3E;\\n&#x3C;!ELEMENT ATTEMPT (action | EPISODE) &#x3E;\\n&#x3C;!ELEMENT INFOS ( ( date | author | a )* ) &#x3E;\\n&#x3C;!ELEMENT title (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT context (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT problem (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT goal (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT subgoal (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT result (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT moral (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT action (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT date (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT author (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT a (#PCDATA)&#x3E;\\n&#x3C;!ATTLIST a\\n      xlink:href CDATA #REQUIRED\\n      xlink:type CDATA #FIXED \\\&#x22;simple\\\&#x22;&#x3E;\&#x22;&#x22;,
+            &#x22;learningObject&#x22;: &#x22;3d7c802a-27fe-4437-8a48-8e379583a570&#x22;,
+        })
+        let assesment = await dtd.perform(programmingExercise, evalReq, &#x22;201800388&#x22;)
+        assert.equal(assesment.summary.classify, &#x22;Accepted&#x22;);
+    }</code></pre></dd>
+/tmp
+        <dt>3d7c802a-27fe-4437-8a48-8e379583a570  INVALID</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/evaluators.js</dt>
+        <dd><pre><code>async function() {
+        await loadSchemaPEARL();
+        await loadSchemaYAPEXIL();
+        let programmingExercise = await ProgrammingExercise.loadRemoteExercise(&#x22;3d7c802a-27fe-4437-8a48-8e379583a570&#x22;, config)
+        const evalReq = new EvaluationReport();
+        evalReq.setRequest({
+            &#x22;date&#x22;: (new Date()).toISOString(),
+            &#x22;program&#x22;: &#x22;\&#x22;&#x3C;!ELEMENT STORY ( context, problem, goal, THREADS, moral, INFOS)&#x3E;\\n&#x3C;!ATTLIST STORY xmlns:xlink CDATA #FIXED \\\&#x22;http://www.w3.org/1999/xlink\\\&#x22;&#x3E;\\n&#x3C;!ELEMENT THREADS (EPISODE+)&#x3E;\\n&#x3C;!ELEMENT EPISODE (subgoal, ATTEMPT+, result) &#x3E;\\n&#x3C;!ELEMENT ATTEMPT (action | EPISODE) &#x3E;\\n&#x3C;!ELEMENT INFOS ( ( date | author | a )* ) &#x3E;\\n&#x3C;!ELEMENT title (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT context (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT problem (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT goal (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT subgoal (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT result (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT moral (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT action (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT date (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT author (#PCDATA) &#x3E;\\n&#x3C;!ELEMENT a (#PCDATA)&#x3E;\\n&#x3C;!ATTLIST a\\n      xlink:href CDATA #REQUIRED\\n      xlink:type CDATA #FIXED \\\&#x22;simple\\\&#x22;&#x3E;\&#x22;&#x22;,
+            &#x22;learningObject&#x22;: &#x22;3d7c802a-27fe-4437-8a48-8e379583a570&#x22;,
+        })
+        let assesment = await dtd.perform(programmingExercise, evalReq, &#x22;201800388&#x22;)
+        assert.equal(assesment.summary.classify, &#x22;Wrong Answer&#x22;);
+    }</code></pre></dd>
+      </dl>
+    </section>
+    <section class="suite">
+      <h1>XSD</h1>
+      <dl>
+/tmp
+        <dt>18177460-840a-4c57-8c24-d671ad9f5f95  VALID</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/evaluators.js</dt>
+        <dd><pre><code>async function() {
+        await loadSchemaPEARL();
+        await loadSchemaYAPEXIL();
+        let programmingExercise = await ProgrammingExercise.loadRemoteExercise(&#x22;18177460-840a-4c57-8c24-d671ad9f5f95&#x22;, config)
+        const evalReq = new EvaluationReport();
+        evalReq.setRequest({
+            &#x22;date&#x22;: (new Date()).toISOString(),
+            &#x22;program&#x22;: &#x22;\&#x22;&#x3C;?xml version=\\\&#x22;1.0\\\&#x22; encoding=\\\&#x22;ISO-8859-1\\\&#x22; ?&#x3E;\\n&#x3C;xs:schema xmlns:xs=\\\&#x22;http://www.w3.org/2001/XMLSchema\\\&#x22;&#x3E;\\n\\n&#x3C;xs:element name=\\\&#x22;shiporder\\\&#x22;&#x3E;\\n &#x3C;xs:complexType&#x3E;\\n  &#x3C;xs:sequence&#x3E;\\n   &#x3C;xs:element name=\\\&#x22;orderperson\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n   &#x3C;xs:element name=\\\&#x22;shipto\\\&#x22;&#x3E;\\n    &#x3C;xs:complexType&#x3E;\\n     &#x3C;xs:sequence&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;name\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;address\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;city\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;country\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n     &#x3C;/xs:sequence&#x3E;\\n    &#x3C;/xs:complexType&#x3E;\\n   &#x3C;/xs:element&#x3E;\\n   &#x3C;xs:element name=\\\&#x22;item\\\&#x22; maxOccurs=\\\&#x22;unbounded\\\&#x22;&#x3E;\\n    &#x3C;xs:complexType&#x3E;\\n     &#x3C;xs:sequence&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;title\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;note\\\&#x22; type=\\\&#x22;xs:string\\\&#x22; minOccurs=\\\&#x22;0\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;quantity\\\&#x22; type=\\\&#x22;xs:positiveInteger\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;price\\\&#x22; type=\\\&#x22;xs:decimal\\\&#x22;/&#x3E;\\n     &#x3C;/xs:sequence&#x3E;\\n    &#x3C;/xs:complexType&#x3E;\\n   &#x3C;/xs:element&#x3E;\\n  &#x3C;/xs:sequence&#x3E;\\n  &#x3C;xs:attribute name=\\\&#x22;orderid\\\&#x22; type=\\\&#x22;xs:string\\\&#x22; use=\\\&#x22;required\\\&#x22;/&#x3E;\\n &#x3C;/xs:complexType&#x3E;\\n&#x3C;/xs:element&#x3E;\\n\\n&#x3C;/xs:schema&#x3E;\&#x22;&#x22;,
+            &#x22;learningObject&#x22;: &#x22;18177460-840a-4c57-8c24-d671ad9f5f95&#x22;,
+        })
+        let assesment = await xsd.perform(programmingExercise, evalReq, &#x22;201800388&#x22;)
+        assert.equal(assesment.summary.classify, &#x22;Accepted&#x22;);
+    }</code></pre></dd>
+/tmp
+        <dt>18177460-840a-4c57-8c24-d671ad9f5f95  INVALID</dt>
+        <dt>/mnt/e/INESCTEC/xml-evaluator/tests/evaluators.js</dt>
+        <dd><pre><code>async function() {
+        await loadSchemaPEARL();
+        await loadSchemaYAPEXIL();
+        let programmingExercise = await ProgrammingExercise.loadRemoteExercise(&#x22;18177460-840a-4c57-8c24-d671ad9f5f95&#x22;, config)
+        const evalReq = new EvaluationReport();
+        evalReq.setRequest({
+            &#x22;date&#x22;: (new Date()).toISOString(),
+            &#x22;program&#x22;: &#x22;\&#x22;&#x3C;?xml version=\\\&#x22;1.0\\\&#x22; encoding=\\\&#x22;ISO-8859-1\\\&#x22; ?&#x3E;\\n&#x3C;xs:schema xmlns:xs=\\\&#x22;http://www.w3.org/2001/XMLSchema\\\&#x22;&#x3E;\\n\\n&#x3C;xs:element name=\\\&#x22;shiporder\\\&#x22;&#x3E;\\n &#x3C;xs:complexType&#x3E;\\n  &#x3C;xs:sequence&#x3E;\\n   &#x3C;xs:element name=\\\&#x22;orderperson\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n   &#x3C;xs:element name=\\\&#x22;shipto\\\&#x22;&#x3E;\\n    &#x3C;xs:complexType&#x3E;\\n     &#x3C;xs:sequence&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;name\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;address\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;city\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;country\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n     &#x3C;/xs:sequence&#x3E;\\n    &#x3C;/xs:complexType&#x3E;\\n   &#x3C;/xs:element&#x3E;\\n   &#x3C;xs:element name=\\\&#x22;item\\\&#x22; maxOccurs=\\\&#x22;unbounded\\\&#x22;&#x3E;\\n    &#x3C;xs:complexType&#x3E;\\n     &#x3C;xs:sequence&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;title\\\&#x22; type=\\\&#x22;xs:string\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;note\\\&#x22; type=\\\&#x22;xs:string\\\&#x22; minOccurs=\\\&#x22;0\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;quantity\\\&#x22; type=\\\&#x22;xs:positiveInteger\\\&#x22;/&#x3E;\\n      &#x3C;xs:element name=\\\&#x22;prie\\\&#x22; type=\\\&#x22;xs:decimal\\\&#x22;/&#x3E;\\n     &#x3C;/xs:sequence&#x3E;\\n    &#x3C;/xs:complexType&#x3E;\\n   &#x3C;/xs:element&#x3E;\\n  &#x3C;/xs:sequence&#x3E;\\n  &#x3C;xs:attribute name=\\\&#x22;orderid\\\&#x22; type=\\\&#x22;xs:string\\\&#x22; use=\\\&#x22;required\\\&#x22;/&#x3E;\\n &#x3C;/xs:complexType&#x3E;\\n&#x3C;/xs:element&#x3E;\\n\\n&#x3C;/xs:schema&#x3E;\&#x22;&#x22;,
+            &#x22;learningObject&#x22;: &#x22;18177460-840a-4c57-8c24-d671ad9f5f95&#x22;,
+        })
+        let assesment = await xsd.perform(programmingExercise, evalReq, &#x22;201800388&#x22;)
+        assert.equal(true, assesment.summary.classify == &#x22;Compile Time Error&#x22; || assesment.summary.classify == &#x22;Wrong Answer&#x22;);
+    }</code></pre></dd>
+      </dl>
+    </section>

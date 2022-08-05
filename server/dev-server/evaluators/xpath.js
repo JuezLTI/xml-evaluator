@@ -5,11 +5,10 @@ import { loadSchemaPEARL, EvaluationReport } from "evaluation-report-juezlti";;
 function perform(programmingExercise, evalReq) {
     return new Promise((resolve) => {
         loadSchemaPEARL().then(() => {
-
             let evalRes = new EvaluationReport();
             evalRes.setRequest(evalReq.request)
             let program = evalReq.request.program
-            const compilationErrors = [];
+            let compilationErrors = [];
             let isWrongAnswer = false;
             let response = {}
             response.report = {}
@@ -38,6 +37,8 @@ function perform(programmingExercise, evalReq) {
                 }
             }
             const solution = programmingExercise.solutions_contents[solution_id]
+
+
             let i = 0;
             try {
                 for (let metadata of programmingExercise.tests) {
@@ -70,6 +71,7 @@ function perform(programmingExercise, evalReq) {
                         null // result
                     )
 
+
                     if (teacherResult.resultType == 1 || teacherResult.resultType == 2) {
                         if ("numberValue" in teacherResult)
                             if (teacherResult.numberValue != studentResult.numberValue) {
@@ -77,23 +79,27 @@ function perform(programmingExercise, evalReq) {
                                 compilationErrors.push({ i: "incorrect xpath expression" })
 
                             }
-                        if ("stringValue:" in teacherResult)
+                        if ("stringValue" in teacherResult) {
+
                             if (teacherResult.stringValue != studentResult.stringValue) {
                                 compilationErrors.push({ i: "incorrect xpath expression" })
-
+                                i++;
 
                             }
+                        }
+
 
                     } else if (teacherResult.resultType == 4 || teacherResult.resultType == 5) {
                         teacherNode = teacherResult.iterateNext();
                         studentNode = studentResult.iterateNext();
-                        console.log("teacher node " + teacherNode)
                         if (teacherNode == undefined) {
                             compilationErrors.push({ i: "incorrect xpath expression" })
+                            i++;
                         } else {
                             while (teacherNode) {
                                 if (teacherNode != studentNode) {
                                     compilationErrors.push({ i: "incorrect xpath expression" })
+                                    i++;
                                     break;
                                 }
                                 teacherNode = teacherResult.iterateNext();

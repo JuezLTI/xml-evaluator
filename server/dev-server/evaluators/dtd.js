@@ -82,7 +82,6 @@ function perform(programmingExercise, evalReq, studentID) {
                         if (libxml.validationDtdErrors != undefined) {
                             testPEARinstance.feedback = libxml.validationDtdErrors[dtd_file][0].message
                         }
-                        console.log(testPEARinstance.feedback)
                         if (eval(current_out)) {
                             testPEARinstance.classify = validation_result ? "Accepted" : "Wrong Answer"
                             if (!validation_result) {

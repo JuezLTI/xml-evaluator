@@ -3,30 +3,37 @@ const chai = require('chai'),
 const path = require('path');
 const uuid = require('uuid');
 const randomstring = require("randomstring");
-const { loadSchemaYAPEXIL, ProgrammingExercise } = require('programming-exercise-juezlti')
+const { loadSchemaYAPEXIL, ProgrammingExercise } = require('programming-exercise-juezlti');
+const { doesNotMatch } = require('assert');
+
+
+const config = {
+    'BASE_URL': "http://fgpe.dcc.fc.up.pt/api",
+    'EMAIL': "info@juezlti.eu",
+    'PASSWORD': "Ju3zLT1.",
+}
 
 describe('Test for ProgrammingExercise', function() {
     this.timeout(10000);
-    const email = "info@juezlti.eu";
-    const password = "Ju3zLT1.";
+
     before(async function() {
 
         await loadSchemaYAPEXIL();
     });
 
     it('Test metadata of an exercise fetched using authokit-api ', async function() {
-
-        let exerciseObj = await ProgrammingExercise.loadRemoteExerciseAuthorkit(`e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7`, email, password)
-        expect(ProgrammingExercise.isValid(exerciseObj)).to.equal(true);
+        let programmingExercise = await ProgrammingExercise.loadRemoteExercise("18177460-840a-4c57-8c24-d671ad9f5f95", config)
+        expect(ProgrammingExercise.isValid(programmingExercise)).to.equal(true);
 
     })
 
     it('Test deserialization and serialization ', async function() {
 
-        let exerciseObj = await ProgrammingExercise.loadRemoteExerciseAuthorkit(`e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7`, email, password)
-        await exerciseObj.serialize(path.join(__dirname, 'resources'));
-        let exerciseObj2 = await ProgrammingExercise.deserialize(path.join(__dirname, 'resources'), "e75ab89a-b03b-4876-8e5b-dcb2e1dd0cf7.zip")
+        let programmingExercise = await ProgrammingExercise.loadRemoteExercise("c9d68b4f-e306-41f5-bba3-cafdcd024bfb", config)
+        await programmingExercise.serialize(path.join(__dirname, 'resources'))
+        let exerciseObj2 = await ProgrammingExercise.deserialize(path.join(__dirname, 'resources'), `${programmingExercise.id}.zip`)
         expect(ProgrammingExercise.isValid(exerciseObj2)).to.equal(true);
+
     })
 
 

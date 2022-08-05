@@ -4,10 +4,10 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "mocha --reporter spec programming-exercise.js evaluation-report.js  ",
-        "todoc": "touch ./docs/test.html ; mocha programming-exercise evaluation-report.js  --reporter=doc | cat  > docs/test.html ",
-        "nyan": "mocha --reporter nyan programming-exercise.js evaluation-report.js ",
-        "plane": "mocha --reporter landing  programming-exercise.js  evaluation-report.js ",
+        "test": "mocha  --reporter spec programming-exercise-juezlti.js evaluation-report-juezlti.js  evaluators.js ",
+        "todoc": "touch ./docs/test.html ; mocha programming-exercise-juezlti.js evaluation-report-juezlti.js  evaluators.js --reporter=doc | cat  > docs/test.html ",
+        "nyan": "mocha --reporter nyan programming-exercise-juezlti.js evaluation-report-juezlti.js evaluators.js ",
+
         "setup": "npm install && mkdir resources docs"
     },
     "author": "",
@@ -15,10 +15,10 @@
     "dependencies": {
         "ajv": "^8.6.3",
         "chai": "^4.3.4",
-        "evaluation-report-juezlti": "^1.0.6-d",
+        "evaluation-report-juezlti": "^1.0.6d",
         "express": "^4.17.1",
         "mocha": "^9.1.1",
-        "programming-exercise-juezlti": "^1.0.5-a",
+        "programming-exercise-juezlti": "^1.1.6",
         "randomstring": "^1.2.1",
         "request": "^2.88.2",
         "util": "^0.12.4",

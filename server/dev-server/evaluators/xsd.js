@@ -32,7 +32,6 @@ function perform(programmingExercise, evalReq, studentID) {
             response.report.exercise = programmingExercise.id
             response.report.tests = []
 
-
             let solution_id = ""
             for (let solutions of programmingExercise.solutions) {
                 if (solutions.lang.toUpperCase() == "XML") {
@@ -44,7 +43,6 @@ function perform(programmingExercise, evalReq, studentID) {
             const xsd_name = `/student-XSD-schemas/student_${studentID}_${programmingExercise.id}.xsd`
 
 
-            const regex = new RegExp('<!DOCTYPE .* SYSTEM ".*">', 'gm')
             const xsd_file = path.join(__dirname, '../../public', xsd_name);
 
             fs.writeFile(xsd_file, program, async(err) => {
@@ -80,10 +78,8 @@ function perform(programmingExercise, evalReq, studentID) {
                         }
                         testPEARinstance.obtainedOutput = validation_result.toString()
                         if (libxml.validationSchemasErrors != undefined) {
-                            console.log(libxml.validationSchemasErrors)
                             testPEARinstance.feedback = libxml.validationSchemasErrors[xsd_file][0].message
                         }
-                        console.log(testPEARinstance.feedback)
                         if (eval(current_out)) {
                             testPEARinstance.classify = validation_result ? "Accepted" : "Wrong Answer"
                             if (!validation_result) {

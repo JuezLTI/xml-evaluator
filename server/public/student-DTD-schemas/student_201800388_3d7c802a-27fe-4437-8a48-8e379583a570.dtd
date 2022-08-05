@@ -1,4 +1,4 @@
-<!ELEMENT STORY (title, context, problem, goal, THREADS, moral, INFOS)>
+<!ELEMENT STORY ( context, problem, goal, THREADS, moral, INFOS)>
 <!ATTLIST STORY xmlns:xlink CDATA #FIXED "http://www.w3.org/1999/xlink">
 <!ELEMENT THREADS (EPISODE+)>
 <!ELEMENT EPISODE (subgoal, ATTEMPT+, result) >
