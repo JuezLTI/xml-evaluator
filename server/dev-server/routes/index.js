@@ -12,55 +12,12 @@ import fs from "fs";
 
 var router = express.Router();
 
-router.get("/capabilities", function(req, res, next) {
-    let evalRes = new EvaluationReport();
-    let obj = {
-        capabilities: [{
-            id: "XPath-evaluator",
-            features: [{
-                    name: "language",
-                    value: "XPath",
-                },
-                {
-                    name: "version",
-                    value: ".01",
-                },
-                {
-                    name: "engine",
-                    value: "https://www.npmjs.com/package/xpath",
-                },
-            ],
-        }, ],
-    };
-
-    evalRes.setReply(obj);
-    res.send(evalRes);
-});
 
 router.get("/invalidate-cache", function(req, res, next) {
     cache = undefined;
     cache = new Cache(60 * 10000);
     res.send("Ok");
 });
-
-
-
-
-router.get("/", function(req, res) {
-    let text = fs.readFileSync(
-        path.join(__dirname, "../../public/doc/intro.txt"), { encoding: "utf8", flag: "r" }
-    );
-    let curl_exm = fs.readFileSync(
-        path.join(__dirname, "../../public/doc/curl"), { encoding: "utf8", flag: "r" }
-    );
-    try {
-        res.render("index");
-    } catch (e) {
-        console.log(e);
-    }
-});
-
-
 
 
 router.post("/eval", async function(req, res, next) {

@@ -408,9 +408,14 @@ class ProgrammingExercise {
                     delete aux.tests_contents_out;
                     delete aux.statements_contents;
                     delete aux.solutions_contents;
+                    delete aux.libraries_contents;
+                    delete aux.skeletons_contents;
+
                     delete aux.solutions;
                     delete aux.statements;
                     delete aux.tests;
+                    delete aux.libraries;
+                    delete aux.skeletons;
 
                     fs.writeFileSync(path.join(directory, "metadata.json"), JSON.stringify(aux, null, '\t'), {
                         encoding: "utf8",
