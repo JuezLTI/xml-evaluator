@@ -1,7 +1,10 @@
 
 <div markdown=1 style="text-align:right"> 
-  <a href="README_EN.md">[EN]</a> 
-  [ES](README_ES.md) ![PT](README_PT.md) ![TR](README_TR.md) ![SV](README_SV.md)
+  <a href="README_en.md">[EN]</a>
+  <a href="README_es.md">[ES]</a> 
+  <a href="README_pt.md">[PT]</a> 
+  <a href="README_tr.md">[tr]</a>
+  <a href="README_sv.md">[SV]</a> 
 </div>
 
 # xml-evaluator
