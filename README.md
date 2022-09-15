@@ -1,3 +1,5 @@
+<div markdown=1 style="text-align:right"> [EN](README_EN.md) [ES](README_ES.md) [PT](README_PT.md) [TR](README_TR.md) [SV](README_SV.md)</div>
+
 # xml-evaluator
 
 ## XML Evaluation service
