@@ -1,11 +1,11 @@
 
-<div markdown=1 style="text-size: small; text-align:right;"> 
+<p align="right"><font size="-1"> 
   <a href="README_en.md">[EN]</a>
   <a href="README_es.md">[ES]</a> 
   <a href="README_pt.md">[PT]</a> 
   <a href="README_tr.md">[TR]</a>
   <a href="README_sv.md">[SV]</a> 
-</div>
+</font></p>
 
 # xml-evaluator
 
