@@ -73,12 +73,22 @@ function perform(programmingExercise, evalReq, studentID) {
                         libxml.loadSchemas([path.join(__dirname, '../../public', xsd_name)]);
                         validation_result = libxml.validateAgainstSchemas();
 
-                        if (validation_result == undefined) {
+                        if (validation_result == null) {
                             throw "Compilation error"
                         }
-                        testPEARinstance.obtainedOutput = validation_result.toString()
+                        testPEARinstance.obtainedOutput = `${Boolean(validation_result)}`
+
+
                         if (libxml.validationSchemasErrors != undefined) {
                             testPEARinstance.feedback = libxml.validationSchemasErrors[xsd_file][0].message
+                        }
+                        //todo
+                        //In case of interest in supporting more than just a 'true' or 'false' string
+                        //use improve the onlyLettersSpacesDots, otherwise the solution content needs to be exactly 'true' or 'false'.
+                        //However be careful about security
+                        //JSON.parse(toString(current_out).toLowerCase())
+                        if(!onlyLettersSpacesDots(current_out)){
+                            throw "The solution content needs to contain only letters or spaces"
                         }
                         if (eval(current_out)) {
                             testPEARinstance.classify = validation_result ? "Accepted" : "Wrong Answer"
@@ -133,6 +143,9 @@ function perform(programmingExercise, evalReq, studentID) {
     })
 
 }
+function onlyLettersSpacesDots(str) {
+    return /^[a-zA-Z\s.,]+$/.test(str);
+  }
 
 module.exports = {
     perform
