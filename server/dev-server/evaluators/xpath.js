@@ -48,6 +48,7 @@ function perform(programmingExercise, evalReq) {
                     testPEARinstance.expectedOutput = solution
                     testPEARinstance.obtainedOutput = program
                     testPEARinstance.mark = metadata.weight
+                    testPEARinstance.visible = metadata.visible
                     testPEARinstance.feedback = ""
                     testPEARinstance.environmentValues = []
 

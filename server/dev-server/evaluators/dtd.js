@@ -67,6 +67,7 @@ function perform(programmingExercise, evalReq, studentID) {
                         testPEARinstance.input = current_in
                         testPEARinstance.expectedOutput = current_out
                         testPEARinstance.mark = metadata.weight
+                        testPEARinstance.visible = metadata.visible
                         testPEARinstance.feedback = ""
                         testPEARinstance.environmentValues = []
                         let validation_result = undefined;
