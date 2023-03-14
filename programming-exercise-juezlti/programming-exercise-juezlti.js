@@ -110,7 +110,7 @@ function normalizeData(data) {
     }
     data.tests.map((t) => {
         if ("visible" in t) {
-            if (t.visible == "true")
+            if (t.visible == "true" || t.visible == true)
                 t.visible = true
             else
                 t.visible = false

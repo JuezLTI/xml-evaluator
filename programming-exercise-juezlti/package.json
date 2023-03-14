@@ -1,6 +1,6 @@
 {
     "name": "programming-exercise-juezlti",
-    "version": "1.1.7",
+    "version": "1.1.8",
     "description": "A class that abstract a YAPEXIL schema also allows to serialize and deserialize exercise as well load remotely",
     "main": "programming-exercise-juezlti.js",
     "scripts": {
