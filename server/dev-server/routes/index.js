@@ -80,6 +80,11 @@ async function evaluate(req) {
         throw new Error("INVALID PEARL");
     }
     const programmingExercise = await getProgrammingExercise(evalReq);
+    
+    programmingExercise.keywords = sanitizeKeywords(programmingExercise.keywords)
+    if(!fulfilPreConditions(JSON.parse(evalReq.request.program), programmingExercise.keywords)) {
+        throw ( new Error("Your solution doesn't meet the requirements."))
+    }
 
     var assesment = undefined
     const target = programmingExercise.programmingLanguages[0].toLowerCase()
@@ -122,4 +127,44 @@ async function getProgrammingExercise(evalReq) {
         return programmingExercise;
     }
 }
+
+const sanitizeKeywords = (keywords) => {
+    let sanitizedKeywords = [];
+    keywords.forEach(keyword => {
+        if (keyword.includes(',')) {
+            keyword.split(',').map(k => k.trim()).forEach(k => sanitizedKeywords.push(k));
+        } else {
+            sanitizedKeywords.push(keyword.trim());
+        }
+    });
+    return sanitizedKeywords;
+}
+
+const fulfilPreConditions = (program, keywords) => {
+    let fulfilled = true
+    let programLowerCase = program.toLowerCase()
+
+    let mandatoryKeyword = keywords.find(keyword => keyword.toLowerCase().startsWith('mandatory'));
+    if (mandatoryKeyword) {
+        let mandatoryKeywords = mandatoryKeyword.toLowerCase().match(/\[(.*?)\]/)[1].split(';')
+        mandatoryKeywords = mandatoryKeywords.map(keyword => keyword.match(/"(.*?)"/)[1]);
+        mandatoryKeywords.forEach(keyword => {
+            if(!programLowerCase.includes(keyword)) {
+                fulfilled = false
+            }
+        })
+    }
+    let forbiddenKeyword = keywords.find(keyword => keyword.toLowerCase().startsWith('forbidden'));
+    if (forbiddenKeyword) {
+        let forbiddenKeywords = forbiddenKeyword.toLowerCase().match(/\[(.*?)\]/)[1].split(';')
+        forbiddenKeywords = forbiddenKeywords.map(keyword => keyword.match(/"(.*?)"/)[1]);
+        forbiddenKeywords.forEach(keyword => {
+            if(programLowerCase.includes(keyword)) {
+                fulfilled = false
+            }
+        })
+    }
+    return fulfilled
+}
+
 export { router };
