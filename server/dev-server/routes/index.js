@@ -9,16 +9,13 @@ import Cache from "cache";
 var cache = new Cache(60 * 10000); // Create a cache with 600 second TTL
 import fs from "fs";
 
-
 var router = express.Router();
-
 
 router.get("/invalidate-cache", function(req, res, next) {
     cache = undefined;
     cache = new Cache(60 * 10000);
     res.send("Ok");
 });
-
 
 router.post("/eval", async function(req, res, next) {
 
@@ -54,22 +51,11 @@ router.post("/eval", async function(req, res, next) {
                 }
             );
 
-
-
-
         })
         .catch((err) => {
             res.send({ "error": err.message }).status(500);
         });
 });
-
-
-
-
-
-
-
-
 
 async function evaluate(req) {
 
@@ -80,9 +66,9 @@ async function evaluate(req) {
         throw new Error("INVALID PEARL");
     }
     const programmingExercise = await getProgrammingExercise(evalReq);
-    
+
     programmingExercise.keywords = sanitizeKeywords(programmingExercise.keywords)
-    if(!fulfilPreConditions(JSON.parse(evalReq.request.program), programmingExercise.keywords)) {
+    if(!fulfilPreConditions(evalReq.request.program, programmingExercise.keywords)) {
         throw ( new Error("Your solution doesn't meet the requirements."))
     }
 
@@ -98,8 +84,6 @@ async function evaluate(req) {
     }
 
 }
-
-
 
 async function getProgrammingExercise(evalReq) {
     console.log("---")

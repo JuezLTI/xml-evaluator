@@ -31,7 +31,7 @@ function perform(programmingExercise, evalReq) {
 
             let solution_id = ""
             for (let solutions of programmingExercise.solutions) {
-                if (solutions.lang.toUpperCase() == "XML") {
+                if (solutions.lang.toUpperCase() == "XPATH") {
                     solution_id = solutions.id
                     break;
                 }
@@ -43,10 +43,9 @@ function perform(programmingExercise, evalReq) {
             try {
                 for (let metadata of programmingExercise.tests) {
                     let testPEARinstance = {}
-
                     testPEARinstance.input = programmingExercise.tests_contents_in[metadata.id]
-                    testPEARinstance.expectedOutput = solution
-                    testPEARinstance.obtainedOutput = program
+                    testPEARinstance.expectedOutput = ""
+                    testPEARinstance.obtainedOutput = ""
                     testPEARinstance.mark = metadata.weight
                     testPEARinstance.visible = metadata.visible
                     testPEARinstance.feedback = ""
@@ -55,7 +54,6 @@ function perform(programmingExercise, evalReq) {
                     let input = new DOMParser().parseFromString(programmingExercise.tests_contents_in[metadata.id]);
                     let teacherNode = null,
                         studentNode = null;
-
 
                     var teacherResult = xpath.evaluate(
                         solution, // xpathExpression
@@ -71,7 +69,6 @@ function perform(programmingExercise, evalReq) {
                         xpath.XPathResult.ANY_TYPE, // resultType
                         null // result
                     )
-
 
                     if (teacherResult.resultType == 1 || teacherResult.resultType == 2) {
                         if ("numberValue" in teacherResult)
@@ -98,6 +95,8 @@ function perform(programmingExercise, evalReq) {
                             i++;
                         } else {
                             while (teacherNode) {
+                                testPEARinstance.expectedOutput += teacherNode.toString() + "\n"
+                                testPEARinstance.obtainedOutput += studentNode.toString() + "\n"
                                 if (teacherNode != studentNode) {
                                     compilationErrors.push({ i: "incorrect xpath expression" })
                                     i++;
@@ -126,9 +125,7 @@ function perform(programmingExercise, evalReq) {
                     "feedback": ""
                 }
 
-
                 resolve(evalRes)
-
 
             } catch (e) {
                 response.report.tests = [];
@@ -144,16 +141,10 @@ function perform(programmingExercise, evalReq) {
                 resolve(evalRes)
             }
 
-
-
-
         })
     })
 
 }
-
-
-
 
 module.exports = {
     perform
