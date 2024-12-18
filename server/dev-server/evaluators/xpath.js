@@ -38,8 +38,6 @@ function perform(programmingExercise, evalReq) {
             }
             const solution = programmingExercise.solutions_contents[solution_id]
 
-
-            let i = 0;
             try {
                 for (let metadata of programmingExercise.tests) {
                     let testPEARinstance = {}
@@ -70,53 +68,21 @@ function perform(programmingExercise, evalReq) {
                         null // result
                     )
 
-                    if (teacherResult.resultType == 1 || teacherResult.resultType == 2) {
-                        if ("numberValue" in teacherResult)
-                            if (teacherResult.numberValue != studentResult.numberValue) {
+                    // Obtener los valores de los resultados
+                    let teacherValue = getResultValue(teacherResult);
+                    let studentValue = getResultValue(studentResult);
 
-                                compilationErrors.push({ i: "incorrect xpath expression" })
+                    // Asignar los valores a testPEARinstance
+                    testPEARinstance.expectedOutput = teacherValue;
+                    testPEARinstance.obtainedOutput = studentValue;
 
-                            }
-                        if ("stringValue" in teacherResult) {
-
-                            if (teacherResult.stringValue != studentResult.stringValue) {
-                                compilationErrors.push({ i: "incorrect xpath expression" })
-                                i++;
-
-                            }
-                        }
-
-
-                    } else if (teacherResult.resultType == 4 || teacherResult.resultType == 5) {
-                        teacherNode = teacherResult.iterateNext();
-                        studentNode = studentResult.iterateNext();
-                        if (teacherNode == undefined) {
-                            compilationErrors.push({ i: "incorrect xpath expression" })
-                            i++;
-                        } else {
-                            while (teacherNode) {
-                                testPEARinstance.expectedOutput += teacherNode.toString() + "\n"
-                                testPEARinstance.obtainedOutput += studentNode.toString() + "\n"
-                                if (teacherNode != studentNode) {
-                                    compilationErrors.push({ i: "incorrect xpath expression" })
-                                    i++;
-                                    break;
-                                }
-                                teacherNode = teacherResult.iterateNext();
-                                studentNode = studentResult.iterateNext();
-                            }
-
-                        }
-                    }
-                    if (compilationErrors.length > 0) {
+                    if (testPEARinstance.expectedOutput == testPEARinstance.obtainedOutput) {
+                        testPEARinstance.classify = "Accepted"
+                    } else {
                         isWrongAnswer = true
                         testPEARinstance.classify = "Wrong Answer"
-
-                    } else {
-                        testPEARinstance.classify = "Accepted"
                     }
                     response.report.tests.push(testPEARinstance)
-                    i++
                 }
                 evalRes.setReply(response)
 
@@ -144,6 +110,28 @@ function perform(programmingExercise, evalReq) {
         })
     })
 
+}
+
+// get result value depending on the result type
+function getResultValue(result) {
+    switch (result.resultType) {
+        case xpath.XPathResult.NUMBER_TYPE:
+            return result.numberValue.toString();
+        case xpath.XPathResult.STRING_TYPE:
+            return result.stringValue;
+        case xpath.XPathResult.BOOLEAN_TYPE:
+            return result.booleanValue.toString();
+        case xpath.XPathResult.UNORDERED_NODE_ITERATOR_TYPE:
+        case xpath.XPathResult.ORDERED_NODE_ITERATOR_TYPE:
+            let nodes = [];
+            let node;
+            while (node = result.iterateNext()) {
+                nodes.push(node.textContent);
+            }
+            return nodes.join("\n");
+        default:
+            throw new Error('Unsupported result type');
+    }
 }
 
 module.exports = {
