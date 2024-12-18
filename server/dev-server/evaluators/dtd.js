@@ -11,7 +11,7 @@ function perform(programmingExercise, evalReq, studentID) {
 
             let evalRes = new EvaluationReport();
             evalRes.setRequest(evalReq.request)
-            let program = JSON.parse(evalReq.request.program)
+            let program = evalReq.request.program
             let isWrongAnswer = false;
             let response = {}
             response.report = {}
@@ -35,7 +35,7 @@ function perform(programmingExercise, evalReq, studentID) {
 
             let solution_id = ""
             for (let solutions of programmingExercise.solutions) {
-                if (solutions.lang.toUpperCase() == "XML") {
+                if (solutions.lang.toUpperCase() == "DTD") {
                     solution_id = solutions.id
                     break;
                 }
@@ -89,7 +89,7 @@ function perform(programmingExercise, evalReq, studentID) {
                         //However be careful about security
                         //JSON.parse(toString(current_out).toLowerCase())
                         if(!onlyLettersSpacesDots(current_out)){
-                            throw "The solution content needs to contain only letters or spaces"
+                            throw "The solution needs to contain only letters or spaces"
                         }
                         if (eval(current_out)) {
                             testPEARinstance.classify = validation_result ? "Accepted" : "Wrong Answer"
@@ -132,6 +132,16 @@ function perform(programmingExercise, evalReq, studentID) {
                     evalRes.setReply(response)
                     resolve(evalRes)
 
+                } finally {
+                    // Borrar el fichero creado
+                    fs.unlink(dtd_file, (err) => {
+                        if (err) {
+                            console.error('Error al borrar el archivo:', err);
+                        } else {
+                            console.log('Archivo borrado exitosamente');
+                        }
+                    });
+                
                 }
             });
 
