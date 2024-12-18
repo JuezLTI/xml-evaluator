@@ -11,7 +11,7 @@ function perform(programmingExercise, evalReq, studentID) {
 
             let evalRes = new EvaluationReport();
             evalRes.setRequest(evalReq.request)
-            let program = JSON.parse(evalReq.request.program)
+            let program = evalReq.request.program
             let isWrongAnswer = false;
             let response = {}
             response.report = {}
@@ -105,10 +105,7 @@ function perform(programmingExercise, evalReq, studentID) {
                         }
 
                         response.report.tests.push(testPEARinstance)
-
-
                     }
-
 
                     evalRes.setReply(response)
 
@@ -116,7 +113,6 @@ function perform(programmingExercise, evalReq, studentID) {
                         "classify": (isWrongAnswer ? "Wrong Answer" : "Accepted"),
                         "feedback": ""
                     }
-
 
                     resolve(evalRes)
                 } catch (e) {
@@ -132,18 +128,21 @@ function perform(programmingExercise, evalReq, studentID) {
                     evalRes.setReply(response)
                     resolve(evalRes)
 
+                } finally {
+                    // Borrar el fichero creado
+                    fs.unlink(xsd_file, (err) => {
+                        if (err) {
+                            console.error('Error al borrar el archivo:', err);
+                        } else {
+                            console.log('Archivo borrado exitosamente');
+                        }
+                    });
                 }
             });
-
-
-
-
-
-
         })
     })
-
 }
+
 function onlyLettersSpacesDots(str) {
     return /^[a-zA-Z\s.,]+$/.test(str);
   }
